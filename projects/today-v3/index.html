@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Today v3 — Agent</title>
+    <style>
+        /* ============================================
+           DESIGN TOKENS (from v2 dark UI)
+           ============================================ */
+        :root {
+            --bg-primary: #0b0f14;
+            --bg-card: #1a1e25;
+            --bg-card-elevated: #242930;
+            --bg-input-border: #3a3f48;
+
+            --text-primary: #ffffff;
+            --text-secondary: #a0a4ab;
+            --text-tertiary: #6b7078;
+            --text-inverse: #0b0f14;
+
+            --accent-blue: #5c9eff;
+            --accent-blue-bg: rgba(92, 158, 255, 0.12);
+            --accent-teal: #3ecfb4;
+            --accent-teal-bg: rgba(62, 207, 180, 0.1);
+            --accent-orange: #ffc554;
+            --accent-orange-bg: rgba(255, 197, 84, 0.12);
+            --accent-purple: #c084fc;
+            --accent-purple-bg: rgba(192, 132, 252, 0.12);
+            --accent-red: #ff5c5c;
+            --accent-red-bg: rgba(255, 92, 92, 0.12);
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-medium: rgba(255, 255, 255, 0.14);
+            --divider: rgba(255, 255, 255, 0.08);
+
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.25rem;
+            --radius-pill: 100px;
+
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 0.75rem;
+            --space-lg: 1rem;
+            --space-xl: 1.25rem;
+            --space-2xl: 1.5rem;
+            --space-3xl: 2rem;
+
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --text-xs: 0.6875rem;
+            --text-sm: 0.75rem;
+            --text-base: 0.875rem;
+            --text-md: 0.9375rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.375rem;
+            --text-2xl: 1.75rem;
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: 100%;
+            padding-bottom: 5.5rem;
+        }
+
+        .page {
+            max-width: 430px;
+            margin: 0 auto;
+            padding: 0 var(--space-xl);
+        }
+
+        /* ============================================
+           TOPBAR
+           ============================================ */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(env(safe-area-inset-top, 0.75rem) + 0.75rem) var(--space-xl) var(--space-md);
+            max-width: 430px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            text-decoration: none;
+            color: var(--accent-blue);
+            font-size: var(--text-md);
+            font-weight: 500;
+        }
+
+        .back-link svg { width: 18px; height: 18px; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8125rem;
+            font-weight: 700;
+        }
+
+        /* ============================================
+           HEADER + GREETING
+           ============================================ */
+        .header {
+            padding: var(--space-md) 0 var(--space-2xl);
+        }
+
+        .date-label {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .greeting {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        /* ============================================
+           STAT BAR (3 chips)
+           ============================================ */
+        .stat-bar {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .stat {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--text-xl);
+            font-weight: 800;
+        }
+
+        .stat-value.green { color: var(--accent-teal); }
+        .stat-value.blue { color: var(--accent-blue); }
+        .stat-value.orange { color: var(--accent-orange); }
+
+        .stat-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: var(--space-xs);
+            font-weight: 500;
+        }
+
+        /* ============================================
+           SECTION
+           ============================================ */
+        .section {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-title {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-md);
+        }
+
+        /* ============================================
+           UP NEXT — Hero card
+           ============================================ */
+        .up-next {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-medium);
+        }
+
+        .up-next-photo {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 140px;
+            height: 100%;
+            opacity: 0.15;
+        }
+
+        .up-next-photo-inner {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #5c6f7a, #8ea8b8);
+            mask-image: linear-gradient(to left, rgba(0,0,0,0.7), transparent);
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.7), transparent);
+        }
+
+        .up-next-eyebrow {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-md);
+        }
+
+        .up-next-type {
+            display: inline-block;
+            font-size: var(--text-xs);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: var(--accent-teal-bg);
+            color: var(--accent-teal);
+            padding: 0.2em 0.6em;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .up-next-title {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            margin-bottom: var(--space-xs);
+        }
+
+        .up-next-address {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .up-next-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .up-next-time {
+            font-size: var(--text-md);
+            font-weight: 600;
+        }
+
+        .up-next-countdown {
+            font-size: var(--text-base);
+            color: var(--accent-teal);
+            font-weight: 700;
+        }
+
+        /* ============================================
+           TIMELINE
+           ============================================ */
+        .timeline { position: relative; }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xs);
+        }
+
+        .timeline-time {
+            width: 48px;
+            flex-shrink: 0;
+            text-align: right;
+            padding-top: var(--space-lg);
+        }
+
+        .timeline-hour {
+            font-size: var(--text-base);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .timeline-period {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .timeline-rail {
+            width: 2px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-tertiary);
+            margin-top: 1.15rem;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-dot.showing { background: var(--accent-blue); }
+        .timeline-dot.closing { background: var(--accent-teal); }
+        .timeline-dot.meeting { background: var(--accent-orange); }
+        .timeline-dot.call { background: var(--accent-purple); }
+
+        .timeline-line {
+            width: 2px;
+            flex: 1;
+            background: var(--border-subtle);
+        }
+
+        .timeline-card {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin: 0.375rem 0;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .timeline-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-md);
+        }
+
+        .timeline-card-info { flex: 1; }
+
+        .timeline-card-badge {
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.55em;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+            display: inline-block;
+        }
+
+        .badge-showing { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .badge-closing { background: var(--accent-teal-bg); color: var(--accent-teal); }
+        .badge-meeting { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .badge-call { background: var(--accent-purple-bg); color: var(--accent-purple); }
+
+        .timeline-card-title {
+            font-size: var(--text-md);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .timeline-card-sub {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .timeline-card-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .thumb-1 { background: linear-gradient(135deg, #5c6f7a, #8ea8b8); }
+        .thumb-2 { background: linear-gradient(135deg, #8e7c6a, #c4b8a4); }
+        .thumb-3 { background: linear-gradient(135deg, #5a7a52, #8a9a7e); }
+
+        .timeline-card-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        .timeline-card-meta a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .timeline-card-price {
+            font-size: var(--text-md);
+            font-weight: 800;
+            color: var(--accent-teal);
+            margin-top: var(--space-sm);
+        }
+
+        /* ============================================
+           HOT LEADS — Horizontal scroll
+           ============================================ */
+        .leads-scroll {
+            display: flex;
+            gap: var(--space-md);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: var(--space-xs);
+            scroll-snap-type: x mandatory;
+        }
+
+        .leads-scroll::-webkit-scrollbar { display: none; }
+
+        .lead-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-xl);
+            min-width: 160px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .lead-card:active { opacity: 0.8; }
+
+        .lead-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-base);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: var(--space-md);
+        }
+
+        .lead-name {
+            font-size: var(--text-md);
+            font-weight: 700;
+        }
+
+        .lead-detail {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .lead-urgency {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            margin-top: var(--space-md);
+            padding: 0.2em 0.55em;
+            border-radius: var(--radius-sm);
+            display: inline-block;
+        }
+
+        .urgency-hot {
+            background: var(--accent-red-bg);
+            color: var(--accent-red);
+        }
+
+        .urgency-warm {
+            background: var(--accent-orange-bg);
+            color: var(--accent-orange);
+        }
+
+        .urgency-new {
+            background: var(--accent-blue-bg);
+            color: var(--accent-blue);
+        }
+
+        /* ============================================
+           MARKET PULSE — 3-column chips
+           ============================================ */
+        .pulse-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .pulse-chip {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+        }
+
+        .pulse-value {
+            font-size: var(--text-lg);
+            font-weight: 800;
+        }
+
+        .pulse-label {
+            font-size: 0.625rem;
+            color: var(--text-tertiary);
+            margin-top: var(--space-xs);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .pulse-trend {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            margin-top: var(--space-xs);
+        }
+
+        .trend-up { color: var(--accent-teal); }
+        .trend-down { color: var(--accent-red); }
+        .trend-flat { color: var(--text-tertiary); }
+
+        /* ============================================
+           QUICK ACTIONS — Sticky bottom bar
+           ============================================ */
+        .quick-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(11, 15, 20, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--border-subtle);
+            padding: var(--space-md) 0 calc(var(--space-md) + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+
+        .quick-actions-inner {
+            max-width: 430px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 var(--space-sm);
+        }
+
+        .qa-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            text-decoration: none;
+            color: var(--text-tertiary);
+            font-size: 0.625rem;
+            font-weight: 500;
+            padding: var(--space-xs) var(--space-sm);
+            border: none;
+            background: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .qa-btn:active { opacity: 0.5; }
+        .qa-btn.primary { color: var(--accent-blue); }
+
+        .qa-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qa-icon svg { width: 22px; height: 22px; }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <a href="../../index.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Prototypes
+        </a>
+        <div class="avatar">JR</div>
+    </nav>
+
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <p class="date-label" id="date-label"></p>
+            <h1 class="greeting" id="greeting"></h1>
+
+            <div class="stat-bar">
+                <div class="stat">
+                    <div class="stat-value green">2</div>
+                    <div class="stat-label">Closings this mo.</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value blue">8</div>
+                    <div class="stat-label">Active listings</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value orange">3</div>
+                    <div class="stat-label">Pending offers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Up Next -->
+        <div class="section">
+            <div class="up-next">
+                <div class="up-next-photo"><div class="up-next-photo-inner"></div></div>
+                <div class="up-next-eyebrow">Up Next</div>
+                <div class="up-next-type">Showing</div>
+                <div class="up-next-title">Buyer Tour — The Millers</div>
+                <div class="up-next-address">742 Oceanview Dr, Santa Cruz</div>
+                <div class="up-next-bottom">
+                    <div class="up-next-time">10:00 AM</div>
+                    <div class="up-next-countdown" id="countdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Schedule -->
+        <div class="section">
+            <div class="section-title">Today's Schedule</div>
+            <div class="timeline">
+
+                <!-- 10:00 AM Showing -->
+                <div class="timeline-item">
+                    <div class="timeline-time">
+                        <div class="timeline-hour">10:00</div>
+                        <div class="timeline-period">AM</div>
+                    </div>
+                    <div class="timeline-rail">
+                        <div class="timeline-dot showing"></div>
+                        <div class="timeline-line"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-top">
+                            <div class="timeline-card-info">
+                                <span class="timeline-card-badge badge-showing">Showing</span>
+                                <div class="timeline-card-title">742 Oceanview Dr</div>
+                                <div class="timeline-card-sub">Buyer: The Millers</div>
+                            </div>
+                            <div class="timeline-card-thumb thumb-3"></div>
+                        </div>
+                        <div class="timeline-card-meta">
+                            <span>3 bd / 2 ba</span>
+                            <span>$1.2M</span>
+                            <a href="tel:+15551234567">Call buyer</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11:30 AM Showing -->
+                <div class="timeline-item">
+                    <div class="timeline-time">
+                        <div class="timeline-hour">11:30</div>
+                        <div class="timeline-period">AM</div>
+                    </div>
+                    <div class="timeline-rail">
+                        <div class="timeline-dot showing"></div>
+                        <div class="timeline-line"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-top">
+                            <div class="timeline-card-info">
+                                <span class="timeline-card-badge badge-showing">Showing</span>
+                                <div class="timeline-card-title">1580 Bay St, Unit 4</div>
+                                <div class="timeline-card-sub">Buyer: Sarah Chen</div>
+                            </div>
+                            <div class="timeline-card-thumb thumb-2"></div>
+                        </div>
+                        <div class="timeline-card-meta">
+                            <span>2 bd / 2 ba</span>
+                            <span>$875K</span>
+                            <a href="tel:+15559876543">Call buyer</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1:00 PM Call -->
+                <div class="timeline-item">
+                    <div class="timeline-time">
+                        <div class="timeline-hour">1:00</div>
+                        <div class="timeline-period">PM</div>
+                    </div>
+                    <div class="timeline-rail">
+                        <div class="timeline-dot call"></div>
+                        <div class="timeline-line"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-top">
+                            <div class="timeline-card-info">
+                                <span class="timeline-card-badge badge-call">Call</span>
+                                <div class="timeline-card-title">Listing consultation</div>
+                                <div class="timeline-card-sub">David & Maria Reyes</div>
+                            </div>
+                        </div>
+                        <div class="timeline-card-meta">
+                            <span>New listing prospect</span>
+                            <a href="tel:+15555551234">Call</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2:30 PM Meeting -->
+                <div class="timeline-item">
+                    <div class="timeline-time">
+                        <div class="timeline-hour">2:30</div>
+                        <div class="timeline-period">PM</div>
+                    </div>
+                    <div class="timeline-rail">
+                        <div class="timeline-dot meeting"></div>
+                        <div class="timeline-line"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-top">
+                            <div class="timeline-card-info">
+                                <span class="timeline-card-badge badge-meeting">Meeting</span>
+                                <div class="timeline-card-title">Offer review — 88 Pine</div>
+                                <div class="timeline-card-sub">With escrow & title</div>
+                            </div>
+                        </div>
+                        <div class="timeline-card-meta">
+                            <span>2 competing offers</span>
+                            <span>Zoom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4:00 PM Closing -->
+                <div class="timeline-item">
+                    <div class="timeline-time">
+                        <div class="timeline-hour">4:00</div>
+                        <div class="timeline-period">PM</div>
+                    </div>
+                    <div class="timeline-rail">
+                        <div class="timeline-dot closing"></div>
+                        <div class="timeline-line"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-top">
+                            <div class="timeline-card-info">
+                                <span class="timeline-card-badge badge-closing">Closing</span>
+                                <div class="timeline-card-title">215 Elm St — Final signing</div>
+                                <div class="timeline-card-sub">Buyer: Tom Nakamura</div>
+                            </div>
+                            <div class="timeline-card-thumb thumb-1"></div>
+                        </div>
+                        <div class="timeline-card-price">$945,000</div>
+                        <div class="timeline-card-meta">
+                            <span>4 bd / 3 ba</span>
+                            <span>Title office — downtown</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Hot Leads -->
+        <div class="section">
+            <div class="section-title">Follow up today</div>
+            <div class="leads-scroll">
+                <a href="tel:+15551111111" class="lead-card">
+                    <div class="lead-avatar" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">KP</div>
+                    <div class="lead-name">Kevin Park</div>
+                    <div class="lead-detail">Looking in Westside</div>
+                    <span class="lead-urgency urgency-hot">3 days — follow up</span>
+                </a>
+                <a href="tel:+15552222222" class="lead-card">
+                    <div class="lead-avatar" style="background: linear-gradient(135deg, #f7971e, #ffd200);">LT</div>
+                    <div class="lead-name">Lisa Tran</div>
+                    <div class="lead-detail">Pre-approved $1.1M</div>
+                    <span class="lead-urgency urgency-warm">Toured 2 homes</span>
+                </a>
+                <a href="tel:+15553333333" class="lead-card">
+                    <div class="lead-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">RJ</div>
+                    <div class="lead-name">Raj & Priya J.</div>
+                    <div class="lead-detail">Relocating from LA</div>
+                    <span class="lead-urgency urgency-new">New lead</span>
+                </a>
+                <a href="tel:+15554444444" class="lead-card">
+                    <div class="lead-avatar" style="background: linear-gradient(135deg, #11998e, #38ef7d);">MW</div>
+                    <div class="lead-name">Megan Walsh</div>
+                    <div class="lead-detail">Selling 3bd Capitola</div>
+                    <span class="lead-urgency urgency-warm">Needs CMA</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Market Pulse -->
+        <div class="section">
+            <div class="section-title">Market Pulse</div>
+            <div class="pulse-grid">
+                <div class="pulse-chip">
+                    <div class="pulse-value">18</div>
+                    <div class="pulse-label">Avg days on mkt</div>
+                    <div class="pulse-trend trend-down">-3 days</div>
+                </div>
+                <div class="pulse-chip">
+                    <div class="pulse-value">42</div>
+                    <div class="pulse-label">New this week</div>
+                    <div class="pulse-trend trend-up">+8%</div>
+                </div>
+                <div class="pulse-chip">
+                    <div class="pulse-value">6.8%</div>
+                    <div class="pulse-label">30yr rate</div>
+                    <div class="pulse-trend trend-flat">+0.1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="quick-actions-inner">
+            <button class="qa-btn primary" onclick="alert('Add showing')">
+                <div class="qa-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"/></svg>
+                </div>
+                Showing
+            </button>
+            <button class="qa-btn" onclick="alert('Log activity')">
+                <div class="qa-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                </div>
+                Log
+            </button>
+            <button class="qa-btn" onclick="alert('New listing')">
+                <div class="qa-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                </div>
+                Listing
+            </button>
+            <button class="qa-btn" onclick="alert('Call lead')">
+                <div class="qa-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                </div>
+                Call
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Date
+        const now = new Date();
+        const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+        document.getElementById('date-label').textContent = now.toLocaleDateString('en-US', opts).toUpperCase();
+
+        // Greeting
+        const hour = now.getHours();
+        const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+        document.getElementById('greeting').textContent = `Good ${timeOfDay}, Jamie`;
+
+        // Countdown to 10:00 AM
+        function updateCountdown() {
+            const target = new Date();
+            target.setHours(10, 0, 0, 0);
+            const diff = target - new Date();
+            const el = document.getElementById('countdown');
+
+            if (diff <= 0) {
+                el.textContent = 'Now';
+                return;
+            }
+
+            const hrs = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+
+            if (hrs > 0) {
+                el.textContent = `Starts in ${hrs}h ${mins}m`;
+            } else {
+                el.textContent = `Starts in ${mins}m`;
+            }
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+    </script>
+</body>
+</html>
