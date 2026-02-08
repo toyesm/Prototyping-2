@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Today v5 — Deal Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f14;
+            --bg-card: #1a1e25;
+            --bg-card-elevated: #242930;
+            --bg-input-border: #3a3f48;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a4ab;
+            --text-tertiary: #6b7078;
+            --text-inverse: #0b0f14;
+            --accent-blue: #5c9eff;
+            --accent-blue-bg: rgba(92,158,255,0.12);
+            --accent-teal: #3ecfb4;
+            --accent-teal-bg: rgba(62,207,180,0.1);
+            --accent-orange: #ffc554;
+            --accent-orange-bg: rgba(255,197,84,0.12);
+            --accent-purple: #c084fc;
+            --accent-purple-bg: rgba(192,132,252,0.12);
+            --accent-red: #ff5c5c;
+            --accent-red-bg: rgba(255,92,92,0.12);
+            --border-subtle: rgba(255,255,255,0.08);
+            --border-medium: rgba(255,255,255,0.14);
+            --divider: rgba(255,255,255,0.08);
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.25rem;
+            --radius-pill: 100px;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 0.75rem;
+            --space-lg: 1rem;
+            --space-xl: 1.25rem;
+            --space-2xl: 1.5rem;
+            --space-3xl: 2rem;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --text-xs: 0.6875rem;
+            --text-sm: 0.75rem;
+            --text-base: 0.875rem;
+            --text-md: 0.9375rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.375rem;
+            --text-2xl: 1.75rem;
+            --text-3xl: 2.25rem;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 5.5rem;
+        }
+        .page { max-width: 430px; margin: 0 auto; }
+
+        /* =============================================
+           DASHBOARD HEADER — compact, no hero
+           ============================================= */
+        .dash-header {
+            padding: calc(env(safe-area-inset-top, 2.75rem) + 0.75rem) var(--space-xl) var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dash-header-left { flex: 1; }
+        .dash-greeting {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+        .dash-date {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .dash-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex; align-items: center; justify-content: center;
+            font-size: var(--text-base); font-weight: 700; color: #fff;
+            flex-shrink: 0;
+            margin-left: var(--space-lg);
+        }
+
+        /* =============================================
+           DA-09: TabToggle — Today / This Week
+           ============================================= */
+        .tab-toggle-wrap {
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .tab-toggle {
+            display: flex;
+            background: var(--bg-card-elevated);
+            border-radius: var(--radius-pill);
+            padding: 3px;
+        }
+        .tab-toggle-btn {
+            flex: 1;
+            padding: 0.5em 0;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: var(--text-base);
+            font-weight: 600;
+            font-family: var(--font-family);
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-toggle-btn.active {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           UP NEXT — compact notification card
+           ============================================= */
+        .upnext-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--space-lg) var(--space-lg);
+            padding: var(--space-xl);
+            display: flex;
+            gap: var(--space-xl);
+            align-items: stretch;
+            border: 1px solid var(--border-subtle);
+        }
+        .upnext-thumb {
+            width: 88px;
+            flex-shrink: 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .upnext-body { flex: 1; display: flex; flex-direction: column; }
+        .upnext-badge {
+            align-self: flex-start;
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: var(--accent-teal-bg);
+            color: var(--accent-teal);
+            padding: 0.15em 0.55em;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+        }
+        .upnext-address {
+            font-size: var(--text-lg);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .upnext-detail {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+        .upnext-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--accent-teal-bg);
+            border: 1px solid rgba(62,207,180,0.25);
+            border-radius: var(--radius-pill);
+            padding: var(--space-sm) var(--space-lg);
+            margin-top: auto;
+            font-size: var(--text-sm);
+        }
+        .upnext-pill-time { color: var(--text-primary); font-weight: 700; }
+        .upnext-pill-action {
+            color: var(--accent-teal);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* =============================================
+           DA-08: PillSelector — deal stage filter
+           ============================================= */
+        .pill-selector-wrap {
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+        .pill-selector {
+            display: flex;
+            gap: var(--space-sm);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .pill-selector::-webkit-scrollbar { display: none; }
+        .pill-btn {
+            border-radius: var(--radius-pill);
+            border: 1.5px solid var(--border-medium);
+            background: transparent;
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            font-weight: 700;
+            font-family: var(--font-family);
+            padding: 0.45em 1em;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pill-btn.active {
+            background: var(--text-primary);
+            color: var(--text-inverse);
+            border-color: var(--text-primary);
+        }
+
+        /* =============================================
+           DA-11: PropertyCard — horizontal deal cards
+           ============================================= */
+        .deals-scroll {
+            display: flex;
+            gap: var(--space-md);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 var(--space-xl) var(--space-sm);
+            scroll-snap-type: x mandatory;
+        }
+        .deals-scroll::-webkit-scrollbar { display: none; }
+        .deal-card {
+            flex-shrink: 0;
+            width: 175px;
+            scroll-snap-align: start;
+        }
+        .deal-card-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+        }
+        .deal-card-badge {
+            position: absolute;
+            top: var(--space-sm);
+            left: var(--space-sm);
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.5em;
+            border-radius: var(--radius-sm);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            color: #fff;
+        }
+        .deal-card-fav {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: none; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .deal-card-fav svg { width: 14px; height: 14px; }
+        .deal-card-price {
+            font-size: var(--text-lg);
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-top: var(--space-sm);
+        }
+        .deal-card-specs {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .deal-card-address {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+        .deal-card-status {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+        }
+        .status-active { color: var(--accent-blue); }
+        .status-pending { color: var(--accent-orange); }
+        .status-closing { color: var(--accent-teal); }
+
+        /* =============================================
+           DA-03: SectionCard
+           ============================================= */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--space-lg) var(--space-lg);
+            padding: var(--space-2xl);
+        }
+        .section-card-title {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            margin-bottom: var(--space-2xl);
+        }
+        .section-label {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* =============================================
+           DA-10: DataTable — schedule rows
+           ============================================= */
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 3.5rem 1fr auto;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--divider);
+        }
+        .schedule-row:last-child { border-bottom: none; }
+        .schedule-time {
+            font-size: var(--text-base);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .schedule-event-name {
+            font-size: var(--text-base);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .schedule-event-sub {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .schedule-type {
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.55em;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+        }
+        .type-showing { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .type-closing { background: var(--accent-teal-bg); color: var(--accent-teal); }
+        .type-meeting { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .type-call { background: var(--accent-purple-bg); color: var(--accent-purple); }
+
+        /* Live indicator dot */
+        .schedule-time .live-dot {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            margin-right: 4px;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* =============================================
+           DA-04: FactsGrid — lead overview
+           ============================================= */
+        .leads-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+        }
+        .lead-card {
+            background: var(--bg-card-elevated);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .lead-card-top {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .lead-card-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: var(--text-xs); font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+        .lead-card-name {
+            font-size: var(--text-base);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .lead-card-detail {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            line-height: 1.35;
+        }
+        .lead-card-tag {
+            align-self: flex-start;
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.5em;
+            border-radius: var(--radius-sm);
+        }
+        .tag-hot { background: var(--accent-red-bg); color: var(--accent-red); }
+        .tag-warm { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .tag-new { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .tag-nurture { background: var(--accent-purple-bg); color: var(--accent-purple); }
+        .lead-card-action {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--accent-blue);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: auto;
+        }
+        .lead-card-action svg { width: 14px; height: 14px; }
+
+        /* =============================================
+           DA-07: PaymentBreakdown — commission
+           ============================================= */
+        .commission-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: var(--space-xl);
+        }
+        .commission-label {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+        }
+        .commission-amount {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            line-height: 1;
+        }
+        .commission-change {
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        .change-up { color: var(--accent-teal); }
+        .change-down { color: var(--accent-red); }
+        .payment-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            font-size: var(--text-base);
+        }
+        .payment-row-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+        }
+        .payment-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-closed { background: var(--accent-teal); }
+        .dot-pending { background: var(--accent-blue); }
+        .dot-negotiation { background: var(--accent-orange); }
+        .dot-prospect { background: var(--accent-purple); }
+        .payment-row-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .payment-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: var(--space-lg);
+            gap: 2px;
+        }
+        .payment-bar-seg { height: 100%; border-radius: 4px; }
+
+        /* =============================================
+           Mini stats row — compact KPIs
+           ============================================= */
+        .stats-row {
+            display: flex;
+            gap: var(--space-sm);
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .stat-chip {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+        }
+        .stat-chip-value {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-chip-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+        }
+
+        /* =============================================
+           DA-05: TagCloud — market
+           ============================================= */
+        .tags-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        .tag {
+            background: var(--bg-card-elevated);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-pill);
+            padding: 0.4em 0.85em;
+            font-size: var(--text-xs);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .tag-accent { border-color: rgba(62,207,180,0.3); color: var(--accent-teal); }
+        .tag-warn { border-color: rgba(255,197,84,0.3); color: var(--accent-orange); }
+
+        /* Show more link */
+        .show-more-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--accent-blue);
+            font-size: var(--text-base);
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: var(--space-2xl);
+        }
+        .show-more-link svg { width: 16px; height: 16px; }
+
+        /* =============================================
+           DA-13: StickyBottomBar
+           ============================================= */
+        .sticky-bottom {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(11,15,20,0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--border-subtle);
+            padding: var(--space-md) var(--space-xl) calc(var(--space-md) + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+        .sticky-bottom-inner {
+            max-width: 430px;
+            margin: 0 auto;
+            display: flex;
+            gap: var(--space-md);
+        }
+        .btn-outline {
+            padding: 0.85em 1.25em;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--accent-blue);
+            background: transparent;
+            color: var(--accent-blue);
+            font-size: var(--text-md);
+            font-weight: 700;
+            font-family: var(--font-family);
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-outline:active { opacity: 0.7; }
+        .btn-primary {
+            flex: 1;
+            padding: 0.85em 1.25em;
+            border-radius: var(--radius-lg);
+            border: none;
+            background: var(--accent-blue);
+            color: var(--text-inverse);
+            font-size: var(--text-md);
+            font-weight: 700;
+            font-family: var(--font-family);
+            cursor: pointer;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary:active { opacity: 0.85; }
+        .btn-primary-sub {
+            display: block;
+            font-size: var(--text-xs);
+            font-weight: 500;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+
+        /* Placeholder images */
+        .img-placeholder-1 { background: linear-gradient(135deg, #5a7a52, #8a9a7e); }
+        .img-placeholder-2 { background: linear-gradient(135deg, #7a8a6e, #bac4a8); }
+        .img-placeholder-3 { background: linear-gradient(135deg, #6b7a60, #a4b89a); }
+        .img-placeholder-4 { background: linear-gradient(135deg, #8e7c6a, #c4b8a4); }
+        .img-placeholder-5 { background: linear-gradient(135deg, #5c6f7a, #8ea8b8); }
+        .img-placeholder-6 { background: linear-gradient(135deg, #7a6a5c, #b4a494); }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+
+        <!-- Dashboard Header — compact, no hero -->
+        <div class="dash-header">
+            <div class="dash-header-left">
+                <div class="dash-greeting" id="greeting">Good morning</div>
+                <div class="dash-date" id="dateLabel">Saturday, Feb 8</div>
+            </div>
+            <div class="dash-avatar">JR</div>
+        </div>
+
+        <!-- DA-09: TabToggle — Today / This Week -->
+        <div class="tab-toggle-wrap">
+            <div class="tab-toggle">
+                <button class="tab-toggle-btn active" onclick="switchTab(this, 'today')">Today</button>
+                <button class="tab-toggle-btn" onclick="switchTab(this, 'week')">This Week</button>
+            </div>
+        </div>
+
+        <!-- Mini stat chips — KPIs at a glance -->
+        <div class="stats-row">
+            <div class="stat-chip">
+                <div class="stat-chip-value" style="color: var(--accent-blue);">5</div>
+                <div class="stat-chip-label">Events</div>
+            </div>
+            <div class="stat-chip">
+                <div class="stat-chip-value" style="color: var(--accent-teal);">8</div>
+                <div class="stat-chip-label">Listings</div>
+            </div>
+            <div class="stat-chip">
+                <div class="stat-chip-value" style="color: var(--accent-orange);">3</div>
+                <div class="stat-chip-label">Offers</div>
+            </div>
+            <div class="stat-chip">
+                <div class="stat-chip-value" style="color: var(--accent-purple);">12</div>
+                <div class="stat-chip-label">Leads</div>
+            </div>
+        </div>
+
+        <!-- Up Next — compact notification card with property thumb -->
+        <div class="upnext-card">
+            <div class="upnext-thumb img-placeholder-1"></div>
+            <div class="upnext-body">
+                <span class="upnext-badge">Up Next</span>
+                <div class="upnext-address">742 Oceanview Dr</div>
+                <div class="upnext-detail">3 bd / 2 ba · $1.2M<br>Buyer: The Millers</div>
+                <div class="upnext-pill">
+                    <span class="upnext-pill-time" id="countdown">In 2h 15m</span>
+                    <a href="tel:+15551234567" class="upnext-pill-action">Call buyer</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DA-08: PillSelector — deal stage filter -->
+        <div class="pill-selector-wrap">
+            <div class="pill-selector">
+                <button class="pill-btn active" onclick="filterDeals(this)">All deals</button>
+                <button class="pill-btn" onclick="filterDeals(this)">Active</button>
+                <button class="pill-btn" onclick="filterDeals(this)">Pending</button>
+                <button class="pill-btn" onclick="filterDeals(this)">Closing</button>
+                <button class="pill-btn" onclick="filterDeals(this)">Sold</button>
+            </div>
+        </div>
+
+        <!-- DA-11: PropertyCard — horizontal deal scroll -->
+        <div class="deals-scroll">
+            <div class="deal-card">
+                <div class="deal-card-img img-placeholder-1">
+                    <span class="deal-card-badge">Buyer</span>
+                    <button class="deal-card-fav" aria-label="Favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                    </button>
+                </div>
+                <div class="deal-card-price">$1,200,000</div>
+                <div class="deal-card-specs">3 bd · 2 ba · 1,450 sqft</div>
+                <div class="deal-card-address">742 Oceanview Dr, Santa Cruz</div>
+                <div class="deal-card-status status-active">Active — Showing today</div>
+            </div>
+
+            <div class="deal-card">
+                <div class="deal-card-img img-placeholder-5">
+                    <span class="deal-card-badge">Buyer</span>
+                    <button class="deal-card-fav" aria-label="Favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                    </button>
+                </div>
+                <div class="deal-card-price">$875,000</div>
+                <div class="deal-card-specs">2 bd · 2 ba · 1,100 sqft</div>
+                <div class="deal-card-address">1580 Bay St, Unit 4</div>
+                <div class="deal-card-status status-active">Active — Showing today</div>
+            </div>
+
+            <div class="deal-card">
+                <div class="deal-card-img img-placeholder-4">
+                    <span class="deal-card-badge">Seller</span>
+                    <button class="deal-card-fav" aria-label="Favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                    </button>
+                </div>
+                <div class="deal-card-price">$945,000</div>
+                <div class="deal-card-specs">4 bd · 3 ba · 2,200 sqft</div>
+                <div class="deal-card-address">215 Elm St</div>
+                <div class="deal-card-status status-closing">Closing today 4:00 PM</div>
+            </div>
+
+            <div class="deal-card">
+                <div class="deal-card-img img-placeholder-2">
+                    <span class="deal-card-badge">Seller</span>
+                    <button class="deal-card-fav" aria-label="Favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                    </button>
+                </div>
+                <div class="deal-card-price">$1,450,000</div>
+                <div class="deal-card-specs">5 bd · 4 ba · 3,100 sqft</div>
+                <div class="deal-card-address">88 Pine Ridge Rd</div>
+                <div class="deal-card-status status-pending">Pending — 2 offers</div>
+            </div>
+
+            <div class="deal-card">
+                <div class="deal-card-img img-placeholder-6">
+                    <span class="deal-card-badge">Buyer</span>
+                    <button class="deal-card-fav" aria-label="Favorite">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                    </button>
+                </div>
+                <div class="deal-card-price">$720,000</div>
+                <div class="deal-card-specs">2 bd · 1 ba · 980 sqft</div>
+                <div class="deal-card-address">402 Maple Ave, #3</div>
+                <div class="deal-card-status status-active">Active — Tour scheduled</div>
+            </div>
+        </div>
+        <div style="height: var(--space-lg);"></div>
+
+        <!-- DA-10: DataTable — today's schedule -->
+        <div class="section-card">
+            <div class="section-card-title">Schedule</div>
+
+            <div class="schedule-row">
+                <div class="schedule-time">10:00</div>
+                <div>
+                    <div class="schedule-event-name">742 Oceanview Dr</div>
+                    <div class="schedule-event-sub">Showing · The Millers</div>
+                </div>
+                <span class="schedule-type type-showing">Showing</span>
+            </div>
+
+            <div class="schedule-row">
+                <div class="schedule-time">11:30</div>
+                <div>
+                    <div class="schedule-event-name">1580 Bay St, Unit 4</div>
+                    <div class="schedule-event-sub">Showing · Sarah Chen</div>
+                </div>
+                <span class="schedule-type type-showing">Showing</span>
+            </div>
+
+            <div class="schedule-row">
+                <div class="schedule-time">1:00</div>
+                <div>
+                    <div class="schedule-event-name">Listing consultation</div>
+                    <div class="schedule-event-sub">David & Maria Reyes</div>
+                </div>
+                <span class="schedule-type type-call">Call</span>
+            </div>
+
+            <div class="schedule-row">
+                <div class="schedule-time">2:30</div>
+                <div>
+                    <div class="schedule-event-name">Offer review — 88 Pine</div>
+                    <div class="schedule-event-sub">Escrow & title · Zoom</div>
+                </div>
+                <span class="schedule-type type-meeting">Meeting</span>
+            </div>
+
+            <div class="schedule-row">
+                <div class="schedule-time">4:00</div>
+                <div>
+                    <div class="schedule-event-name">215 Elm St — Close</div>
+                    <div class="schedule-event-sub">Tom Nakamura · $945K</div>
+                </div>
+                <span class="schedule-type type-closing">Closing</span>
+            </div>
+        </div>
+
+        <!-- DA-04 adapted: Lead cards as grid -->
+        <div class="section-card">
+            <div class="section-card-title">Follow up today</div>
+            <div class="leads-grid">
+                <div class="lead-card">
+                    <div class="lead-card-top">
+                        <div class="lead-card-avatar" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">KP</div>
+                        <div class="lead-card-name">Kevin Park</div>
+                    </div>
+                    <div class="lead-card-detail">Westside · $950K pre-approved</div>
+                    <span class="lead-card-tag tag-hot">3 days overdue</span>
+                    <a href="tel:+15551234567" class="lead-card-action">
+                        Call
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    </a>
+                </div>
+
+                <div class="lead-card">
+                    <div class="lead-card-top">
+                        <div class="lead-card-avatar" style="background: linear-gradient(135deg, #f7971e, #ffd200);">LT</div>
+                        <div class="lead-card-name">Lisa Tran</div>
+                    </div>
+                    <div class="lead-card-detail">$1.1M · Toured 2 homes</div>
+                    <span class="lead-card-tag tag-warm">Warm</span>
+                    <a href="tel:+15559876543" class="lead-card-action">
+                        Call
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    </a>
+                </div>
+
+                <div class="lead-card">
+                    <div class="lead-card-top">
+                        <div class="lead-card-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">RJ</div>
+                        <div class="lead-card-name">Raj & Priya</div>
+                    </div>
+                    <div class="lead-card-detail">Relocating from LA</div>
+                    <span class="lead-card-tag tag-new">New lead</span>
+                    <a href="tel:+15555551234" class="lead-card-action">
+                        Call
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    </a>
+                </div>
+
+                <div class="lead-card">
+                    <div class="lead-card-top">
+                        <div class="lead-card-avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">MC</div>
+                        <div class="lead-card-name">Maria Chen</div>
+                    </div>
+                    <div class="lead-card-detail">Investment property</div>
+                    <span class="lead-card-tag tag-nurture">Nurture</span>
+                    <a href="tel:+15553334444" class="lead-card-action">
+                        Call
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    </a>
+                </div>
+            </div>
+            <a href="#" class="show-more-link">All 12 leads <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></a>
+        </div>
+
+        <!-- DA-07: Commission Pipeline -->
+        <div class="section-card">
+            <div class="section-card-title">Commission pipeline</div>
+            <div class="commission-header">
+                <div>
+                    <div class="commission-label">Monthly projected</div>
+                    <div class="commission-amount">$127,400</div>
+                </div>
+                <span class="commission-change change-up">+18% vs last mo.</span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-row-label"><span class="payment-dot dot-closed"></span> Closed</span>
+                <span class="payment-row-value">$61,200</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-row-label"><span class="payment-dot dot-pending"></span> Pending close</span>
+                <span class="payment-row-value">$40,800</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-row-label"><span class="payment-dot dot-negotiation"></span> In negotiation</span>
+                <span class="payment-row-value">$17,200</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-row-label"><span class="payment-dot dot-prospect"></span> Prospect</span>
+                <span class="payment-row-value">$8,200</span>
+            </div>
+
+            <div class="payment-bar">
+                <div class="payment-bar-seg" style="background: var(--accent-teal); flex: 48;"></div>
+                <div class="payment-bar-seg" style="background: var(--accent-blue); flex: 32;"></div>
+                <div class="payment-bar-seg" style="background: var(--accent-orange); flex: 13;"></div>
+                <div class="payment-bar-seg" style="background: var(--accent-purple); flex: 7;"></div>
+            </div>
+        </div>
+
+        <!-- DA-05: Market Conditions -->
+        <div class="section-card">
+            <div class="section-card-title">Market pulse</div>
+            <div class="tags-wrap">
+                <span class="tag tag-accent">Seller's Market</span>
+                <span class="tag">18 Avg Days</span>
+                <span class="tag tag-warn">Low Inventory</span>
+                <span class="tag">42 New This Week</span>
+                <span class="tag">6.8% 30yr Rate</span>
+                <span class="tag tag-accent">+8% Listings</span>
+            </div>
+        </div>
+
+        <div style="height: var(--space-lg);"></div>
+    </div>
+
+    <!-- DA-13: StickyBottomBar -->
+    <div class="sticky-bottom">
+        <div class="sticky-bottom-inner">
+            <button class="btn-outline">+ Log</button>
+            <button class="btn-primary">
+                Call Kevin Park
+                <span class="btn-primary-sub">3 days overdue · Hot lead</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Greeting based on time of day
+        (function() {
+            const h = new Date().getHours();
+            const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+            document.getElementById('greeting').textContent = g;
+            const opts = { weekday: 'long', month: 'short', day: 'numeric' };
+            document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('en-US', opts);
+        })();
+
+        // Countdown to next showing (10 AM)
+        function updateCountdown() {
+            const target = new Date();
+            target.setHours(10, 0, 0, 0);
+            const diff = target - new Date();
+            const el = document.getElementById('countdown');
+            if (diff <= 0) { el.textContent = 'Now'; return; }
+            const hrs = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+            el.textContent = hrs > 0 ? `In ${hrs}h ${mins}m` : `In ${mins}m`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+
+        // TabToggle
+        function switchTab(btn, tab) {
+            btn.parentElement.querySelectorAll('.tab-toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // PillSelector
+        function filterDeals(btn) {
+            btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+    </script>
+</body>
+</html>
