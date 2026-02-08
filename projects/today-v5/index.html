@@ -742,6 +742,30 @@
         .img-placeholder-4 { background: linear-gradient(135deg, #8e7c6a, #c4b8a4); }
         .img-placeholder-5 { background: linear-gradient(135deg, #5c6f7a, #8ea8b8); }
         .img-placeholder-6 { background: linear-gradient(135deg, #7a6a5c, #b4a494); }
+        .img-placeholder-7 { background: linear-gradient(135deg, #5a6a7a, #8a9aaa); }
+        .img-placeholder-8 { background: linear-gradient(135deg, #6a5a7a, #9a8aaa); }
+        .img-placeholder-9 { background: linear-gradient(135deg, #7a7a5a, #aaba8a); }
+        .img-placeholder-10 { background: linear-gradient(135deg, #5a7a6a, #8aaa9a); }
+
+        /* Deal count badge on pills */
+        .pill-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            font-size: 0.625rem;
+            font-weight: 800;
+            margin-left: 0.35em;
+            padding: 0 0.35em;
+            background: var(--border-medium);
+            color: var(--text-secondary);
+        }
+        .pill-btn.active .pill-count {
+            background: rgba(255,255,255,0.2);
+            color: var(--text-inverse);
+        }
     </style>
 </head>
 <body>
@@ -799,84 +823,21 @@
             </div>
         </div>
 
-        <!-- DA-08: PillSelector — deal stage filter -->
+        <!-- DA-08: PillSelector — deal type filter -->
         <div class="pill-selector-wrap">
-            <div class="pill-selector">
-                <button class="pill-btn active" onclick="filterDeals(this)">All deals</button>
-                <button class="pill-btn" onclick="filterDeals(this)">Active</button>
-                <button class="pill-btn" onclick="filterDeals(this)">Pending</button>
-                <button class="pill-btn" onclick="filterDeals(this)">Closing</button>
-                <button class="pill-btn" onclick="filterDeals(this)">Sold</button>
+            <div class="pill-selector" id="pillSelector">
+                <button class="pill-btn active" data-filter="all">All</button>
+                <button class="pill-btn" data-filter="touring">Touring</button>
+                <button class="pill-btn" data-filter="listing">Listing</button>
+                <button class="pill-btn" data-filter="showing">Showing</button>
+                <button class="pill-btn" data-filter="pending">Pending</button>
+                <button class="pill-btn" data-filter="closing">Closing</button>
             </div>
         </div>
 
-        <!-- DA-11: PropertyCard — horizontal deal scroll -->
-        <div class="deals-scroll">
-            <div class="deal-card">
-                <div class="deal-card-img img-placeholder-1">
-                    <span class="deal-card-badge">Buyer</span>
-                    <button class="deal-card-fav" aria-label="Favorite">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-                    </button>
-                </div>
-                <div class="deal-card-price">$1,200,000</div>
-                <div class="deal-card-specs">3 bd · 2 ba · 1,450 sqft</div>
-                <div class="deal-card-address">742 Oceanview Dr, Santa Cruz</div>
-                <div class="deal-card-status status-active">Active — Showing today</div>
-            </div>
-
-            <div class="deal-card">
-                <div class="deal-card-img img-placeholder-5">
-                    <span class="deal-card-badge">Buyer</span>
-                    <button class="deal-card-fav" aria-label="Favorite">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-                    </button>
-                </div>
-                <div class="deal-card-price">$875,000</div>
-                <div class="deal-card-specs">2 bd · 2 ba · 1,100 sqft</div>
-                <div class="deal-card-address">1580 Bay St, Unit 4</div>
-                <div class="deal-card-status status-active">Active — Showing today</div>
-            </div>
-
-            <div class="deal-card">
-                <div class="deal-card-img img-placeholder-4">
-                    <span class="deal-card-badge">Seller</span>
-                    <button class="deal-card-fav" aria-label="Favorite">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-                    </button>
-                </div>
-                <div class="deal-card-price">$945,000</div>
-                <div class="deal-card-specs">4 bd · 3 ba · 2,200 sqft</div>
-                <div class="deal-card-address">215 Elm St</div>
-                <div class="deal-card-status status-closing">Closing today 4:00 PM</div>
-            </div>
-
-            <div class="deal-card">
-                <div class="deal-card-img img-placeholder-2">
-                    <span class="deal-card-badge">Seller</span>
-                    <button class="deal-card-fav" aria-label="Favorite">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-                    </button>
-                </div>
-                <div class="deal-card-price">$1,450,000</div>
-                <div class="deal-card-specs">5 bd · 4 ba · 3,100 sqft</div>
-                <div class="deal-card-address">88 Pine Ridge Rd</div>
-                <div class="deal-card-status status-pending">Pending — 2 offers</div>
-            </div>
-
-            <div class="deal-card">
-                <div class="deal-card-img img-placeholder-6">
-                    <span class="deal-card-badge">Buyer</span>
-                    <button class="deal-card-fav" aria-label="Favorite">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-                    </button>
-                </div>
-                <div class="deal-card-price">$720,000</div>
-                <div class="deal-card-specs">2 bd · 1 ba · 980 sqft</div>
-                <div class="deal-card-address">402 Maple Ave, #3</div>
-                <div class="deal-card-status status-active">Active — Tour scheduled</div>
-            </div>
-        </div>
+        <!-- DA-11: PropertyCard — dynamic deal scroll -->
+        <div class="deals-scroll" id="dealsScroll"></div>
+        <div id="dealsEmpty" style="display:none; text-align:center; padding: var(--space-2xl) var(--space-xl); color: var(--text-tertiary); font-size: var(--text-base);">No deals match this filter</div>
         <div style="height: var(--space-lg);"></div>
 
         <!-- DA-10: DataTable — today's schedule -->
@@ -1138,19 +1099,18 @@
     </div>
 
     <script>
-        // Greeting based on time of day
+        // ---- Greeting ----
         (function() {
             const h = new Date().getHours();
-            const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-            document.getElementById('greeting').textContent = g;
-            const opts = { weekday: 'long', month: 'short', day: 'numeric' };
-            document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('en-US', opts);
+            document.getElementById('greeting').textContent =
+                h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+            document.getElementById('dateLabel').textContent =
+                new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
         })();
 
-        // Countdown to next showing (10 AM)
+        // ---- Countdown ----
         function updateCountdown() {
-            const target = new Date();
-            target.setHours(10, 0, 0, 0);
+            const target = new Date(); target.setHours(10, 0, 0, 0);
             const diff = target - new Date();
             const el = document.getElementById('countdown');
             if (diff <= 0) { el.textContent = 'Now'; return; }
@@ -1161,25 +1121,144 @@
         updateCountdown();
         setInterval(updateCountdown, 60000);
 
-        // TabToggle
+        // ---- Deal Data ----
+        const heartSvg = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>';
+
+        const statusColors = {
+            touring:  { cls: 'status-active',  color: '--accent-blue' },
+            showing:  { cls: 'status-active',  color: '--accent-blue' },
+            listing:  { cls: 'status-pending',  color: '--accent-orange' },
+            pending:  { cls: 'status-pending', color: '--accent-orange' },
+            closing:  { cls: 'status-closing', color: '--accent-teal' }
+        };
+
+        // "today" deals — things happening today
+        const dealsToday = [
+            { id: 1, type: 'showing', side: 'Buyer', price: '$1,200,000', specs: '3 bd · 2 ba · 1,450 sqft', address: '742 Oceanview Dr, Santa Cruz', status: 'Showing at 10:00 AM', img: 'img-placeholder-1' },
+            { id: 2, type: 'touring', side: 'Buyer', price: '$875,000', specs: '2 bd · 2 ba · 1,100 sqft', address: '1580 Bay St, Unit 4', status: 'Tour at 11:30 AM', img: 'img-placeholder-5' },
+            { id: 3, type: 'listing', side: 'Seller', price: '$1,450,000', specs: '5 bd · 4 ba · 3,100 sqft', address: '88 Pine Ridge Rd', status: 'Listing consult 1:00 PM', img: 'img-placeholder-2' },
+            { id: 4, type: 'closing', side: 'Seller', price: '$945,000', specs: '4 bd · 3 ba · 2,200 sqft', address: '215 Elm St', status: 'Closing at 4:00 PM', img: 'img-placeholder-4' },
+            { id: 5, type: 'touring', side: 'Buyer', price: '$720,000', specs: '2 bd · 1 ba · 980 sqft', address: '402 Maple Ave, #3', status: 'Tour at 5:30 PM', img: 'img-placeholder-6' },
+        ];
+
+        // "this week" deals — superset (today + rest of week)
+        const dealsWeek = [
+            ...dealsToday,
+            { id: 6, type: 'showing', side: 'Buyer', price: '$1,100,000', specs: '3 bd · 2 ba · 1,800 sqft', address: '330 Riverside Dr', status: 'Showing Wed 2:00 PM', img: 'img-placeholder-7' },
+            { id: 7, type: 'touring', side: 'Buyer', price: '$1,600,000', specs: '4 bd · 3 ba · 2,800 sqft', address: '1200 Pacific Ave', status: 'Tour Thu 10:00 AM', img: 'img-placeholder-8' },
+            { id: 8, type: 'pending', side: 'Seller', price: '$895,000', specs: '2 bd · 2 ba · 1,200 sqft', address: '15 Harbor Ct', status: 'Offer review Thu', img: 'img-placeholder-9' },
+            { id: 9, type: 'listing', side: 'Seller', price: '$1,050,000', specs: '3 bd · 2 ba · 1,600 sqft', address: '820 Mission St', status: 'Photos Tue · List Wed', img: 'img-placeholder-10' },
+            { id: 10, type: 'closing', side: 'Seller', price: '$780,000', specs: '3 bd · 2 ba · 1,350 sqft', address: '55 Walnut St', status: 'Closing Fri 11:00 AM', img: 'img-placeholder-3' },
+            { id: 11, type: 'pending', side: 'Buyer', price: '$1,320,000', specs: '4 bd · 3 ba · 2,400 sqft', address: '190 Seabright Ave', status: 'Counter expires Wed', img: 'img-placeholder-1' },
+        ];
+
+        // KPI data per tab
+        const statsToday = { events: 5, listings: 8, offers: 3, leads: 12 };
+        const statsWeek  = { events: 11, listings: 10, offers: 7, leads: 18 };
+
+        // ---- State ----
+        let currentTab = 'today';
+        let currentFilter = 'all';
+
+        function getCurrentDeals() {
+            return currentTab === 'today' ? dealsToday : dealsWeek;
+        }
+
+        function getFilteredDeals() {
+            const deals = getCurrentDeals();
+            if (currentFilter === 'all') return deals;
+            return deals.filter(d => d.type === currentFilter);
+        }
+
+        // ---- Render deal cards ----
+        function renderDeals() {
+            const filtered = getFilteredDeals();
+            const container = document.getElementById('dealsScroll');
+            const empty = document.getElementById('dealsEmpty');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = '';
+                return;
+            }
+            empty.style.display = 'none';
+
+            container.innerHTML = filtered.map(d => {
+                const sc = statusColors[d.type] || statusColors.touring;
+                return `<div class="deal-card">
+                    <div class="deal-card-img ${d.img}">
+                        <span class="deal-card-badge">${d.side}</span>
+                        <button class="deal-card-fav" aria-label="Favorite">${heartSvg}</button>
+                    </div>
+                    <div class="deal-card-price">${d.price}</div>
+                    <div class="deal-card-specs">${d.specs}</div>
+                    <div class="deal-card-address">${d.address}</div>
+                    <div class="deal-card-status ${sc.cls}">${d.status}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- Update pill counts ----
+        function updatePillCounts() {
+            const deals = getCurrentDeals();
+            const counts = { all: deals.length };
+            ['touring','listing','showing','pending','closing'].forEach(t => {
+                counts[t] = deals.filter(d => d.type === t).length;
+            });
+            document.querySelectorAll('#pillSelector .pill-btn').forEach(btn => {
+                const f = btn.dataset.filter;
+                const countEl = btn.querySelector('.pill-count');
+                if (countEl) countEl.textContent = counts[f] || 0;
+                else {
+                    const span = document.createElement('span');
+                    span.className = 'pill-count';
+                    span.textContent = counts[f] || 0;
+                    btn.appendChild(span);
+                }
+            });
+        }
+
+        // ---- Update KPI stat chips ----
+        function updateStats() {
+            const s = currentTab === 'today' ? statsToday : statsWeek;
+            const chips = document.querySelectorAll('.stat-chip');
+            const vals = [s.events, s.listings, s.offers, s.leads];
+            chips.forEach((chip, i) => {
+                chip.querySelector('.stat-chip-value').textContent = vals[i];
+            });
+        }
+
+        // ---- Tab toggle (Today / This Week) ----
         function switchTab(btn, tab) {
             btn.parentElement.querySelectorAll('.tab-toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            currentTab = tab;
+            updatePillCounts();
+            updateStats();
+            renderDeals();
         }
 
-        // PillSelector
-        function filterDeals(btn) {
-            btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        // ---- Pill selector ----
+        document.getElementById('pillSelector').addEventListener('click', function(e) {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            this.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-        }
+            currentFilter = btn.dataset.filter;
+            renderDeals();
+        });
 
-        // Market tab toggle
+        // ---- Market tab toggle ----
         function switchMarketTab(btn, tab) {
             btn.parentElement.querySelectorAll('.market-tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('market-changes').style.display = tab === 'changes' ? '' : 'none';
             document.getElementById('market-snapshot').style.display = tab === 'snapshot' ? '' : 'none';
         }
+
+        // ---- Initial render ----
+        updatePillCounts();
+        renderDeals();
     </script>
 </body>
 </html>
