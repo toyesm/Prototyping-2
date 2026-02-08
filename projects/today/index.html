@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Today</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1.25rem 4rem;
+        }
+
+        /* Top bar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: #007aff;
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Date header */
+        .date-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #86868b;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Greeting */
+        .greeting {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #86868b;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Cards */
+        .card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 0.625rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        /* Task items */
+        .task {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .task:last-child { border-bottom: none; }
+
+        .task-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #d1d1d6;
+            flex-shrink: 0;
+            margin-top: 1px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-check.checked {
+            background: #34c759;
+            border-color: #34c759;
+        }
+
+        .task-check.checked::after {
+            content: '';
+            width: 6px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-top: -2px;
+        }
+
+        .task-content { flex: 1; }
+
+        .task-title {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .task.done .task-title {
+            text-decoration: line-through;
+            color: #86868b;
+        }
+
+        .task-meta {
+            font-size: 0.8125rem;
+            color: #86868b;
+            margin-top: 0.125rem;
+        }
+
+        .priority-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.375rem;
+        }
+
+        .priority-high { background: #ff3b30; }
+        .priority-med { background: #ff9500; }
+        .priority-low { background: #34c759; }
+
+        /* Weather / info strip */
+        .info-strip {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.25rem;
+        }
+
+        .info-chip {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .info-chip-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .info-chip-label {
+            font-size: 0.75rem;
+            color: #86868b;
+            margin-top: 0.125rem;
+        }
+
+        /* Quote */
+        .quote {
+            font-size: 0.9375rem;
+            font-style: italic;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        .quote-author {
+            font-size: 0.8125rem;
+            font-style: normal;
+            color: #86868b;
+            margin-top: 0.375rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <a href="../../index.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Prototypes
+        </a>
+    </nav>
+
+    <div class="page">
+        <p class="date-label" id="date-label"></p>
+        <h1 class="page-title">Today</h1>
+
+        <!-- At a glance -->
+        <div class="section">
+            <p class="section-title">At a glance</p>
+            <div class="info-strip">
+                <div class="info-chip">
+                    <div class="info-chip-value">3</div>
+                    <div class="info-chip-label">Tasks left</div>
+                </div>
+                <div class="info-chip">
+                    <div class="info-chip-value">2</div>
+                    <div class="info-chip-label">Meetings</div>
+                </div>
+                <div class="info-chip">
+                    <div class="info-chip-value">72°</div>
+                    <div class="info-chip-label">Sunny</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Focus tasks -->
+        <div class="section">
+            <p class="section-title">Focus</p>
+            <div class="card">
+                <div class="task" data-id="1">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <div class="task-content">
+                        <div class="task-title"><span class="priority-dot priority-high"></span>Ship Today prototype</div>
+                        <div class="task-meta">Prototype Lab</div>
+                    </div>
+                </div>
+                <div class="task" data-id="2">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <div class="task-content">
+                        <div class="task-title"><span class="priority-dot priority-high"></span>Review pull request</div>
+                        <div class="task-meta">Due by noon</div>
+                    </div>
+                </div>
+                <div class="task" data-id="3">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <div class="task-content">
+                        <div class="task-title"><span class="priority-dot priority-med"></span>Draft project brief</div>
+                        <div class="task-meta">Q1 Planning</div>
+                    </div>
+                </div>
+                <div class="task done" data-id="4">
+                    <div class="task-check checked" onclick="toggleTask(this)"></div>
+                    <div class="task-content">
+                        <div class="task-title"><span class="priority-dot priority-low"></span>Morning standup</div>
+                        <div class="task-meta">9:00 AM — Done</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="section">
+            <p class="section-title">Schedule</p>
+            <div class="card">
+                <div class="task">
+                    <div class="task-content">
+                        <div class="task-title">Design Review</div>
+                        <div class="task-meta">10:30 AM — 11:00 AM</div>
+                    </div>
+                </div>
+                <div class="task">
+                    <div class="task-content">
+                        <div class="task-title">Sprint Planning</div>
+                        <div class="task-meta">2:00 PM — 3:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily quote -->
+        <div class="section">
+            <div class="card">
+                <p class="quote">"The best way to predict the future is to invent it."</p>
+                <p class="quote-author">— Alan Kay</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date
+        const now = new Date();
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        document.getElementById('date-label').textContent = now.toLocaleDateString('en-US', options).toUpperCase();
+
+        // Toggle tasks
+        function toggleTask(el) {
+            el.classList.toggle('checked');
+            el.closest('.task').classList.toggle('done');
+            updateCount();
+        }
+
+        function updateCount() {
+            const remaining = document.querySelectorAll('.task:not(.done) .task-check').length;
+            document.querySelector('.info-chip-value').textContent = remaining;
+        }
+    </script>
+</body>
+</html>
