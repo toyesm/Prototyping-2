@@ -835,6 +835,149 @@
         .img-placeholder-4 { background: linear-gradient(135deg, #8e7c6a, #c4b8a4); }
         .img-placeholder-5 { background: linear-gradient(135deg, #5c6f7a, #8ea8b8); }
         .img-placeholder-6 { background: linear-gradient(135deg, #7a6a5c, #b4a494); }
+
+        /* ============================================
+           DESIGN SYSTEM REFERENCE
+           ============================================ */
+        .ds-ref {
+            border-top: 1px solid var(--border-medium);
+            margin-top: var(--space-3xl);
+            padding: var(--space-3xl) var(--space-xl) var(--space-3xl);
+        }
+
+        .ds-ref-header {
+            margin-bottom: var(--space-3xl);
+        }
+
+        .ds-ref-title {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .ds-ref-subtitle {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+            margin-top: var(--space-xs);
+        }
+
+        .ds-section {
+            margin-bottom: var(--space-3xl);
+        }
+
+        .ds-section-title {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-blue);
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .ds-component {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .ds-component-name {
+            font-size: var(--text-md);
+            font-weight: 700;
+            color: var(--accent-teal);
+            margin-bottom: var(--space-xs);
+        }
+
+        .ds-component-desc {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: var(--space-md);
+        }
+
+        .ds-spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .ds-spec-table th {
+            text-align: left;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            padding: var(--space-sm) var(--space-sm) var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .ds-spec-table td {
+            padding: var(--space-sm) var(--space-sm) var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .ds-spec-table td:first-child {
+            color: var(--text-primary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ds-spec-table tr:last-child td { border-bottom: none; }
+
+        .ds-swatch-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .ds-swatch {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm) var(--space-md);
+        }
+
+        .ds-swatch-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+        }
+
+        .ds-swatch-label {
+            font-size: var(--text-xs);
+            font-weight: 600;
+        }
+
+        .ds-swatch-value {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .ds-type-row {
+            margin-bottom: var(--space-md);
+        }
+
+        .ds-type-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .ds-rule {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: var(--space-md) var(--space-lg);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-top: var(--space-md);
+        }
+
+        .ds-rule strong { color: var(--accent-orange); }
     </style>
 </head>
 <body>
@@ -1169,6 +1312,334 @@
         </div>
 
         <div style="height: 2rem"></div>
+    </div>
+
+    <!-- ==========================================
+         DESIGN SYSTEM REFERENCE
+         ========================================== -->
+    <div class="ds-ref">
+        <div class="page">
+            <div class="ds-ref-header">
+                <div class="ds-ref-title">Dark Agent Design System</div>
+                <div class="ds-ref-subtitle">Component reference &amp; token documentation. See DESIGN_SYSTEM.md for full specs.</div>
+            </div>
+
+            <!-- TOKENS: Colors -->
+            <div class="ds-section">
+                <div class="ds-section-title">Color Tokens</div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">Backgrounds</div>
+                    <div class="ds-swatch-row">
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #0b0f14; border: 1px solid rgba(255,255,255,0.14);"></div>
+                            <div><div class="ds-swatch-label">Primary</div><div class="ds-swatch-value">#0b0f14</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #1a1e25;"></div>
+                            <div><div class="ds-swatch-label">Card</div><div class="ds-swatch-value">#1a1e25</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #242930;"></div>
+                            <div><div class="ds-swatch-label">Elevated</div><div class="ds-swatch-value">#242930</div></div>
+                        </div>
+                    </div>
+                    <div class="ds-rule"><strong>Rule:</strong> Max 3 background layers. Primary → Card → Elevated. Never stack deeper.</div>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">Accents</div>
+                    <div class="ds-swatch-row">
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #5c9eff;"></div>
+                            <div><div class="ds-swatch-label">Blue</div><div class="ds-swatch-value">#5c9eff — Links, CTAs</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #3ecfb4;"></div>
+                            <div><div class="ds-swatch-label">Teal</div><div class="ds-swatch-value">#3ecfb4 — Success, money</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #ffc554;"></div>
+                            <div><div class="ds-swatch-label">Orange</div><div class="ds-swatch-value">#ffc554 — Warnings</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #c084fc;"></div>
+                            <div><div class="ds-swatch-label">Purple</div><div class="ds-swatch-value">#c084fc — Tertiary</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #ff5c5c;"></div>
+                            <div><div class="ds-swatch-label">Red</div><div class="ds-swatch-value">#ff5c5c — Errors, hot</div></div>
+                        </div>
+                    </div>
+                    <div class="ds-rule"><strong>Rule:</strong> Every accent has a tint variant at 10-12% opacity for badge backgrounds. Solid color for text on top of tint.</div>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">Text Hierarchy</div>
+                    <div class="ds-swatch-row">
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #ffffff;"></div>
+                            <div><div class="ds-swatch-label">Primary</div><div class="ds-swatch-value">Headlines, values</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #a0a4ab;"></div>
+                            <div><div class="ds-swatch-label">Secondary</div><div class="ds-swatch-value">Body, descriptions</div></div>
+                        </div>
+                        <div class="ds-swatch">
+                            <div class="ds-swatch-dot" style="background: #6b7078;"></div>
+                            <div><div class="ds-swatch-label">Tertiary</div><div class="ds-swatch-value">Labels, metadata</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOKENS: Typography -->
+            <div class="ds-section">
+                <div class="ds-section-title">Typography Scale</div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-3xl · 36px · 800</div>
+                    <div style="font-size: var(--text-3xl); font-weight: 800;">$1,399,000</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-2xl · 28px · 800</div>
+                    <div style="font-size: var(--text-2xl); font-weight: 800;">$8,384/mo</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-xl · 22px · 800</div>
+                    <div style="font-size: var(--text-xl); font-weight: 800;">Facts & features</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-lg · 18px · 800</div>
+                    <div style="font-size: var(--text-lg); font-weight: 800; color: var(--accent-blue);">$1,399,000</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-md · 15px · 700</div>
+                    <div style="font-size: var(--text-md); font-weight: 700;">742 Oceanview Dr</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-base · 14px · 600</div>
+                    <div style="font-size: var(--text-base); font-weight: 600; color: var(--text-secondary);">4 beds · 3 baths · 1,778 sqft</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-sm · 12px · 500</div>
+                    <div style="font-size: var(--text-sm); font-weight: 500; color: var(--text-tertiary);">bridgeMLS/CCAR ID # 41121244</div>
+                </div>
+                <div class="ds-type-row">
+                    <div class="ds-type-label">--text-xs · 11px · 700 uppercase</div>
+                    <div style="font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-blue);">Showing</div>
+                </div>
+                <div class="ds-rule"><strong>Rule:</strong> 800 is for the single most important element in a section. 700 is the workhorse. Never use 400 — minimum is 500.</div>
+            </div>
+
+            <!-- COMPONENTS -->
+            <div class="ds-section">
+                <div class="ds-section-title">Component Catalog</div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-01: HeroImage</div>
+                    <div class="ds-component-desc">Full-bleed media header for detail views. 280px tall, gradient fade at bottom, floating circle action buttons.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Height</td><td>280px, overflow hidden</td></tr>
+                        <tr><td>Overlay</td><td>80px bottom gradient → bg-primary</td></tr>
+                        <tr><td>Buttons</td><td>36px circle, rgba(0,0,0,0.5), blur(8px)</td></tr>
+                        <tr><td>Icons</td><td>18px, white, stroke-width 2</td></tr>
+                        <tr><td>Layout</td><td>Close left, actions right</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-02: PriceHeader</div>
+                    <div class="ds-component-desc">Primary info block below hero. Large price, icon+text spec row, address line, and teal estimate pill.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Typography</th></tr>
+                        <tr><td>Price</td><td>text-3xl, 800, text-primary</td></tr>
+                        <tr><td>Specs</td><td>text-base, text-secondary, 16px icons</td></tr>
+                        <tr><td>Address</td><td>text-md, text-secondary</td></tr>
+                        <tr><td>EstimatePill</td><td>radius-pill, accent-teal-bg, teal border</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-03: SectionCard</div>
+                    <div class="ds-component-desc">Primary content container. bg-card background, radius-xl, internal padding space-2xl. Always has a title.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Property</th><th>Value</th></tr>
+                        <tr><td>Background</td><td>bg-card (#1a1e25)</td></tr>
+                        <tr><td>Radius</td><td>radius-xl (20px)</td></tr>
+                        <tr><td>Padding</td><td>space-2xl (24px)</td></tr>
+                        <tr><td>Title</td><td>text-xl, 800, margin-bottom space-2xl</td></tr>
+                    </table>
+                    <div class="ds-rule"><strong>Rule:</strong> Never nest SectionCards. Title is mandatory.</div>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-04: FactsGrid</div>
+                    <div class="ds-component-desc">2-column icon + value grid for key property data. Icons are monochrome tertiary.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Grid</td><td>2-col, gap space-2xl</td></tr>
+                        <tr><td>Icon</td><td>28px box, 22px SVG, text-tertiary</td></tr>
+                        <tr><td>Value</td><td>text-base, text-primary</td></tr>
+                        <tr><td>Sub-label</td><td>text-sm, text-tertiary</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-05: TagCloud</div>
+                    <div class="ds-component-desc">Wrapping pill tags for features and highlights. Uppercase, bordered, with optional overflow count.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Container</td><td>flex-wrap, gap space-sm</td></tr>
+                        <tr><td>Tag</td><td>bg-card-elevated, 1px border-medium, radius-pill</td></tr>
+                        <tr><td>Text</td><td>text-xs, 700, uppercase, 0.04em spacing</td></tr>
+                        <tr><td>Overflow</td><td>Same shape, text-tertiary color</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-06: EventCard</div>
+                    <div class="ds-component-desc">Horizontal scroll strip for date-based events. Cards snap into place. Scrollbar hidden.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Card</td><td>min-width 180px, bg-card, 1px border-medium</td></tr>
+                        <tr><td>Date</td><td>text-lg, 700</td></tr>
+                        <tr><td>Time</td><td>text-base, text-secondary</td></tr>
+                        <tr><td>Action</td><td>text-base, accent-blue, 600</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-07: PaymentBreakdown</div>
+                    <div class="ds-component-desc">Financial summary with line items and proportional color bar. Colors: teal/blue/purple.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Amount</td><td>text-2xl, 800</td></tr>
+                        <tr><td>Row</td><td>flex space-between, 10px color dot + label</td></tr>
+                        <tr><td>Bar</td><td>8px height, 4px radius, flex proportional</td></tr>
+                        <tr><td>Link</td><td>accent-blue, 600, chevron icon</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-08: PillSelector</div>
+                    <div class="ds-component-desc">Single-select toggle group. Active pill inverts to white fill with dark text.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>State</th><th>Spec</th></tr>
+                        <tr><td>Default</td><td>transparent, 1.5px border-medium, text-primary</td></tr>
+                        <tr><td>Active</td><td>text-primary bg, text-inverse text</td></tr>
+                        <tr><td>Shape</td><td>radius-pill, text-base, 700</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-09: TabToggle</div>
+                    <div class="ds-component-desc">Binary switcher inside a pill track. Active tab fills with accent-blue.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Track</td><td>bg-card-elevated, radius-pill, 3px padding</td></tr>
+                        <tr><td>Tab default</td><td>text-base, 600, text-secondary</td></tr>
+                        <tr><td>Tab active</td><td>accent-blue bg, text-primary</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-10: DataTable</div>
+                    <div class="ds-component-desc">3-column row grid for history/transaction data. Dividers between rows.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Column</th><th>Spec</th></tr>
+                        <tr><td>Date</td><td>text-base, 600, text-primary</td></tr>
+                        <tr><td>Event</td><td>text-base, text-secondary</td></tr>
+                        <tr><td>Value</td><td>text-base, 600, text-primary, right-aligned</td></tr>
+                        <tr><td>Divider</td><td>1px --divider (none on last row)</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-11: PropertyCard</div>
+                    <div class="ds-component-desc">Listing preview in a 2-column grid. Image with overlaid favorite button and optional badge.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Image</td><td>aspect-ratio 4/3, radius-md</td></tr>
+                        <tr><td>Favorite</td><td>32px circle, blur(4px), top-right</td></tr>
+                        <tr><td>Badge</td><td>rgba(0,0,0,0.6), blur(4px), top-left</td></tr>
+                        <tr><td>Price</td><td>text-lg, 800, accent-blue</td></tr>
+                        <tr><td>Specs</td><td>text-sm, text-secondary</td></tr>
+                        <tr><td>Status</td><td>text-sm, 600, text-primary</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-12: ContactForm</div>
+                    <div class="ds-component-desc">Lead capture form with info banner, labeled inputs, and focus states.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Info banner</td><td>bg-card-elevated, radius-md</td></tr>
+                        <tr><td>Label</td><td>text-base, 700, required marker in accent-red</td></tr>
+                        <tr><td>Input</td><td>bg-input, 1.5px bg-input-border, radius-md</td></tr>
+                        <tr><td>Focus</td><td>border-color: accent-blue</td></tr>
+                        <tr><td>Placeholder</td><td>text-tertiary</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-13: StickyBottomBar</div>
+                    <div class="ds-component-desc">Fixed CTA bar with outline + primary button pair. Respects safe area inset.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Container</td><td>fixed bottom, bg-primary, 1px border-subtle top</td></tr>
+                        <tr><td>Outline btn</td><td>1.5px accent-blue border, accent-blue text</td></tr>
+                        <tr><td>Primary btn</td><td>accent-blue bg, text-inverse, flex: 1</td></tr>
+                        <tr><td>Subtitle</td><td>text-xs, 500, opacity 0.8</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-14: CircleActionButton</div>
+                    <div class="ds-component-desc">Floating icon buttons over images. Two variants: hero (36px) and card (32px).</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Variant</th><th>Spec</th></tr>
+                        <tr><td>Hero</td><td>36px, rgba(0,0,0,0.5), blur(8px)</td></tr>
+                        <tr><td>Card</td><td>32px, rgba(0,0,0,0.35), blur(4px)</td></tr>
+                        <tr><td>Icon</td><td>White, stroke-width 2, centered</td></tr>
+                    </table>
+                </div>
+
+                <div class="ds-component">
+                    <div class="ds-component-name">DA-15: ShowMoreLink</div>
+                    <div class="ds-component-desc">Inline expand trigger. Blue text + chevron, inline-flex aligned.</div>
+                    <table class="ds-spec-table">
+                        <tr><th>Element</th><th>Spec</th></tr>
+                        <tr><td>Text</td><td>text-base, accent-blue, 600</td></tr>
+                        <tr><td>Chevron</td><td>16px, same color</td></tr>
+                        <tr><td>Spacing</td><td>margin-top space-2xl from content above</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LAYOUT RULES -->
+            <div class="ds-section">
+                <div class="ds-section-title">Layout Rules</div>
+                <div class="ds-rule"><strong>Max width:</strong> 430px centered. Matches iPhone Pro viewport.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Page padding:</strong> space-xl (20px) horizontal. SectionCards use their own space-lg margin.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Scroll containers:</strong> Bleed to edges. Padding on items, not container.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Sticky bar:</strong> Always reserve env(safe-area-inset-bottom) for home indicator.</div>
+            </div>
+
+            <!-- INTERACTION -->
+            <div class="ds-section">
+                <div class="ds-section-title">Interaction Patterns</div>
+                <div class="ds-rule"><strong>Tap feedback:</strong> :active { opacity: 0.7 } on all interactive elements.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Transitions:</strong> all 0.15s ease on state changes.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Scroll snap:</strong> scroll-snap-type: x mandatory on horizontal scrolls.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Focus:</strong> Inputs get border-color: accent-blue. No other visible focus rings.</div>
+                <div class="ds-rule" style="margin-top: var(--space-sm);"><strong>Toggle:</strong> JS class swap, one active at a time. No CSS-only toggles.</div>
+            </div>
+
+            <div style="text-align: center; padding: var(--space-3xl) 0;">
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em;">Dark Agent Design System v1.0 — Feb 2026</div>
+            </div>
+        </div>
     </div>
 
     <!-- ==========================================
