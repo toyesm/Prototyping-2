@@ -736,16 +736,28 @@
         }
 
         /* Placeholder images */
-        .img-placeholder-1 { background: linear-gradient(135deg, #5a7a52, #8a9a7e); }
-        .img-placeholder-2 { background: linear-gradient(135deg, #7a8a6e, #bac4a8); }
-        .img-placeholder-3 { background: linear-gradient(135deg, #6b7a60, #a4b89a); }
-        .img-placeholder-4 { background: linear-gradient(135deg, #8e7c6a, #c4b8a4); }
-        .img-placeholder-5 { background: linear-gradient(135deg, #5c6f7a, #8ea8b8); }
-        .img-placeholder-6 { background: linear-gradient(135deg, #7a6a5c, #b4a494); }
-        .img-placeholder-7 { background: linear-gradient(135deg, #5a6a7a, #8a9aaa); }
-        .img-placeholder-8 { background: linear-gradient(135deg, #6a5a7a, #9a8aaa); }
-        .img-placeholder-9 { background: linear-gradient(135deg, #7a7a5a, #aaba8a); }
-        .img-placeholder-10 { background: linear-gradient(135deg, #5a7a6a, #8aaa9a); }
+        .deal-card-img {
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Deal card person line */
+        .deal-card-person {
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .deal-card-person svg { width: 13px; height: 13px; color: var(--text-tertiary); flex-shrink: 0; }
+        .deal-card-context {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: 1px;
+            line-height: 1.35;
+        }
 
         /* Deal count badge on pills */
         .pill-count {
@@ -811,7 +823,7 @@
 
         <!-- Up Next — compact notification card with property thumb -->
         <div class="upnext-card">
-            <div class="upnext-thumb img-placeholder-1"></div>
+            <div class="upnext-thumb" style="background: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=300&h=400&fit=crop') center/cover;"></div>
             <div class="upnext-body">
                 <span class="upnext-badge">Up Next</span>
                 <div class="upnext-address">742 Oceanview Dr</div>
@@ -1132,24 +1144,61 @@
             closing:  { cls: 'status-closing', color: '--accent-teal' }
         };
 
+        // Property photos (Unsplash + Pexels — free, no API key)
+        const photos = {
+            craftsman:   'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop',
+            suburban:    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=400&fit=crop',
+            greenLawn:   'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop',
+            redDoor:     'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&h=400&fit=crop',
+            modern:      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a8?w=600&h=400&fit=crop',
+            luxury:      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
+            twilight:    'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=600',
+            family:      'https://images.pexels.com/photos/3555615/pexels-photo-3555615.jpeg?auto=compress&cs=tinysrgb&w=600',
+            mansion:     'https://images.pexels.com/photos/7031412/pexels-photo-7031412.jpeg?auto=compress&cs=tinysrgb&w=600',
+            forSale:     'https://images.pexels.com/photos/8288954/pexels-photo-8288954.jpeg?auto=compress&cs=tinysrgb&w=600',
+            neighborhood:'https://images.pexels.com/photos/8504300/pexels-photo-8504300.jpeg?auto=compress&cs=tinysrgb&w=600',
+        };
+
         // "today" deals — things happening today
         const dealsToday = [
-            { id: 1, type: 'showing', side: 'Buyer', price: '$1,200,000', specs: '3 bd · 2 ba · 1,450 sqft', address: '742 Oceanview Dr, Santa Cruz', status: 'Showing at 10:00 AM', img: 'img-placeholder-1' },
-            { id: 2, type: 'touring', side: 'Buyer', price: '$875,000', specs: '2 bd · 2 ba · 1,100 sqft', address: '1580 Bay St, Unit 4', status: 'Tour at 11:30 AM', img: 'img-placeholder-5' },
-            { id: 3, type: 'listing', side: 'Seller', price: '$1,450,000', specs: '5 bd · 4 ba · 3,100 sqft', address: '88 Pine Ridge Rd', status: 'Listing consult 1:00 PM', img: 'img-placeholder-2' },
-            { id: 4, type: 'closing', side: 'Seller', price: '$945,000', specs: '4 bd · 3 ba · 2,200 sqft', address: '215 Elm St', status: 'Closing at 4:00 PM', img: 'img-placeholder-4' },
-            { id: 5, type: 'touring', side: 'Buyer', price: '$720,000', specs: '2 bd · 1 ba · 980 sqft', address: '402 Maple Ave, #3', status: 'Tour at 5:30 PM', img: 'img-placeholder-6' },
+            { id: 1, type: 'showing', side: 'Buyer', price: '$1,200,000', specs: '3 bd · 2 ba · 1,450 sqft',
+              address: '742 Oceanview Dr, Santa Cruz', status: 'Showing at 10:00 AM', img: photos.craftsman,
+              person: 'The Millers', context: 'Pre-approved $1.3M · 2nd showing, loved the backyard' },
+            { id: 2, type: 'touring', side: 'Buyer', price: '$875,000', specs: '2 bd · 2 ba · 1,100 sqft',
+              address: '1580 Bay St, Unit 4', status: 'Tour at 11:30 AM', img: photos.modern,
+              person: 'Sarah Chen', context: 'First-time buyer · Wants walkable neighborhood' },
+            { id: 3, type: 'listing', side: 'Seller', price: '$1,450,000', specs: '5 bd · 4 ba · 3,100 sqft',
+              address: '88 Pine Ridge Rd', status: 'Listing consult 1:00 PM', img: photos.luxury,
+              person: 'David & Maria Reyes', context: 'Relocating to Portland · Want to list in 3 weeks' },
+            { id: 4, type: 'closing', side: 'Seller', price: '$945,000', specs: '4 bd · 3 ba · 2,200 sqft',
+              address: '215 Elm St', status: 'Closing at 4:00 PM', img: photos.suburban,
+              person: 'Tom Nakamura', context: 'Title clear · Final walkthrough done · Bring gift bag' },
+            { id: 5, type: 'touring', side: 'Buyer', price: '$720,000', specs: '2 bd · 1 ba · 980 sqft',
+              address: '402 Maple Ave, #3', status: 'Tour at 5:30 PM', img: photos.redDoor,
+              person: 'Kevin Park', context: 'Pre-approved $950K · Looking for investment property' },
         ];
 
         // "this week" deals — superset (today + rest of week)
         const dealsWeek = [
             ...dealsToday,
-            { id: 6, type: 'showing', side: 'Buyer', price: '$1,100,000', specs: '3 bd · 2 ba · 1,800 sqft', address: '330 Riverside Dr', status: 'Showing Wed 2:00 PM', img: 'img-placeholder-7' },
-            { id: 7, type: 'touring', side: 'Buyer', price: '$1,600,000', specs: '4 bd · 3 ba · 2,800 sqft', address: '1200 Pacific Ave', status: 'Tour Thu 10:00 AM', img: 'img-placeholder-8' },
-            { id: 8, type: 'pending', side: 'Seller', price: '$895,000', specs: '2 bd · 2 ba · 1,200 sqft', address: '15 Harbor Ct', status: 'Offer review Thu', img: 'img-placeholder-9' },
-            { id: 9, type: 'listing', side: 'Seller', price: '$1,050,000', specs: '3 bd · 2 ba · 1,600 sqft', address: '820 Mission St', status: 'Photos Tue · List Wed', img: 'img-placeholder-10' },
-            { id: 10, type: 'closing', side: 'Seller', price: '$780,000', specs: '3 bd · 2 ba · 1,350 sqft', address: '55 Walnut St', status: 'Closing Fri 11:00 AM', img: 'img-placeholder-3' },
-            { id: 11, type: 'pending', side: 'Buyer', price: '$1,320,000', specs: '4 bd · 3 ba · 2,400 sqft', address: '190 Seabright Ave', status: 'Counter expires Wed', img: 'img-placeholder-1' },
+            { id: 6, type: 'showing', side: 'Buyer', price: '$1,100,000', specs: '3 bd · 2 ba · 1,800 sqft',
+              address: '330 Riverside Dr', status: 'Showing Wed 2:00 PM', img: photos.greenLawn,
+              person: 'Raj & Priya Mehta', context: 'Relocating from LA · Need 3+ bd, good schools' },
+            { id: 7, type: 'touring', side: 'Buyer', price: '$1,600,000', specs: '4 bd · 3 ba · 2,800 sqft',
+              address: '1200 Pacific Ave', status: 'Tour Thu 10:00 AM', img: photos.mansion,
+              person: 'Lisa Tran', context: 'Move-up buyer · Selling condo first, needs bridge timing' },
+            { id: 8, type: 'pending', side: 'Seller', price: '$895,000', specs: '2 bd · 2 ba · 1,200 sqft',
+              address: '15 Harbor Ct', status: 'Offer review Thu', img: photos.twilight,
+              person: 'Janet & Ron Cole', context: '2 offers in · Highest is $910K, 15-day close' },
+            { id: 9, type: 'listing', side: 'Seller', price: '$1,050,000', specs: '3 bd · 2 ba · 1,600 sqft',
+              address: '820 Mission St', status: 'Photos Tue · List Wed', img: photos.family,
+              person: 'Mike Henderson', context: 'Photographer booked Tue 9 AM · Staging done' },
+            { id: 10, type: 'closing', side: 'Seller', price: '$780,000', specs: '3 bd · 2 ba · 1,350 sqft',
+              address: '55 Walnut St', status: 'Closing Fri 11:00 AM', img: photos.forSale,
+              person: 'Angela Torres', context: 'Appraisal cleared · Buyer financing confirmed' },
+            { id: 11, type: 'pending', side: 'Buyer', price: '$1,320,000', specs: '4 bd · 3 ba · 2,400 sqft',
+              address: '190 Seabright Ave', status: 'Counter expires Wed', img: photos.neighborhood,
+              person: 'The Hendersons', context: 'Countered at $1.29M · Seller wants 30-day close' },
         ];
 
         // KPI data per tab
@@ -1183,16 +1232,19 @@
             }
             empty.style.display = 'none';
 
+            const personIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>';
             container.innerHTML = filtered.map(d => {
                 const sc = statusColors[d.type] || statusColors.touring;
                 return `<div class="deal-card">
-                    <div class="deal-card-img ${d.img}">
+                    <div class="deal-card-img" style="background-image:url('${d.img}')">
                         <span class="deal-card-badge">${d.side}</span>
                         <button class="deal-card-fav" aria-label="Favorite">${heartSvg}</button>
                     </div>
                     <div class="deal-card-price">${d.price}</div>
                     <div class="deal-card-specs">${d.specs}</div>
                     <div class="deal-card-address">${d.address}</div>
+                    <div class="deal-card-person">${personIcon} ${d.person}</div>
+                    <div class="deal-card-context">${d.context}</div>
                     <div class="deal-card-status ${sc.cls}">${d.status}</div>
                 </div>`;
             }).join('');
