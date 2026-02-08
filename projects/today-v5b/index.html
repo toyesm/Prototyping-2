@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Today v5b — Day Planner</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f14;
+            --bg-card: #1a1e25;
+            --bg-card-elevated: #242930;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a4ab;
+            --text-tertiary: #6b7078;
+            --text-inverse: #0b0f14;
+            --accent-blue: #5c9eff;
+            --accent-blue-bg: rgba(92,158,255,0.12);
+            --accent-teal: #3ecfb4;
+            --accent-teal-bg: rgba(62,207,180,0.1);
+            --accent-orange: #ffc554;
+            --accent-orange-bg: rgba(255,197,84,0.12);
+            --accent-purple: #c084fc;
+            --accent-purple-bg: rgba(192,132,252,0.12);
+            --accent-red: #ff5c5c;
+            --accent-red-bg: rgba(255,92,92,0.12);
+            --border-subtle: rgba(255,255,255,0.08);
+            --border-medium: rgba(255,255,255,0.14);
+            --divider: rgba(255,255,255,0.08);
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.25rem;
+            --radius-pill: 100px;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 0.75rem;
+            --space-lg: 1rem;
+            --space-xl: 1.25rem;
+            --space-2xl: 1.5rem;
+            --space-3xl: 2rem;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --text-xs: 0.6875rem;
+            --text-sm: 0.75rem;
+            --text-base: 0.875rem;
+            --text-md: 0.9375rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.375rem;
+            --text-2xl: 1.75rem;
+            --text-3xl: 2.25rem;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 5.5rem;
+        }
+        .page { max-width: 430px; margin: 0 auto; }
+
+        /* =============================================
+           HEADER
+           ============================================= */
+        .dash-header {
+            padding: calc(env(safe-area-inset-top, 2.75rem) + 0.75rem) var(--space-xl) var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dash-header-left { flex: 1; }
+        .dash-greeting {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+        .dash-date {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .dash-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex; align-items: center; justify-content: center;
+            font-size: var(--text-base); font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* =============================================
+           DAY PICKER — calendar card strip
+           ============================================= */
+        .day-picker-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--space-lg) var(--space-lg);
+            padding: var(--space-2xl) var(--space-xl) var(--space-xl);
+        }
+        .day-picker-title {
+            font-size: var(--text-lg);
+            font-weight: 800;
+            margin-bottom: var(--space-xl);
+        }
+        .day-picker-scroll {
+            display: flex;
+            gap: var(--space-sm);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .day-picker-scroll::-webkit-scrollbar { display: none; }
+        .day-cell {
+            flex-shrink: 0;
+            width: 64px;
+            padding: var(--space-md) 0;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1.5px solid var(--border-medium);
+            background: var(--bg-primary);
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+        .day-cell.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        .day-cell.today:not(.active) {
+            border-color: var(--accent-blue);
+        }
+        .day-cell.past {
+            opacity: 0.4;
+        }
+        .day-cell-dow {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+        .day-cell.active .day-cell-dow { color: rgba(255,255,255,0.8); }
+        .day-cell-num {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .day-cell-month {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .day-cell.active .day-cell-month { color: rgba(255,255,255,0.8); }
+        .day-cell-dots {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: var(--space-xs);
+            height: 6px;
+        }
+        .day-cell-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+        }
+        .day-cell.active .day-cell-dot { opacity: 0.8; }
+
+        /* =============================================
+           STATS ROW
+           ============================================= */
+        .stats-row {
+            display: flex;
+            gap: var(--space-sm);
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .stat-chip {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+        }
+        .stat-chip-value {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-chip-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+        }
+
+        /* =============================================
+           PILL SELECTOR
+           ============================================= */
+        .pill-selector-wrap {
+            padding: 0 var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+        .pill-selector {
+            display: flex;
+            gap: var(--space-sm);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .pill-selector::-webkit-scrollbar { display: none; }
+        .pill-btn {
+            border-radius: var(--radius-pill);
+            border: 1.5px solid var(--border-medium);
+            background: transparent;
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            font-weight: 700;
+            font-family: var(--font-family);
+            padding: 0.45em 1em;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pill-btn.active {
+            background: var(--text-primary);
+            color: var(--text-inverse);
+            border-color: var(--text-primary);
+        }
+        .pill-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px; height: 18px;
+            border-radius: 9px;
+            font-size: 0.625rem;
+            font-weight: 800;
+            margin-left: 0.35em;
+            padding: 0 0.35em;
+            background: var(--border-medium);
+            color: var(--text-secondary);
+        }
+        .pill-btn.active .pill-count {
+            background: rgba(0,0,0,0.15);
+            color: var(--text-inverse);
+        }
+
+        /* =============================================
+           DEAL CARDS
+           ============================================= */
+        .deals-scroll {
+            display: flex;
+            gap: var(--space-md);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 var(--space-xl) var(--space-sm);
+            scroll-snap-type: x mandatory;
+        }
+        .deals-scroll::-webkit-scrollbar { display: none; }
+        .deal-card {
+            flex-shrink: 0;
+            width: 175px;
+            scroll-snap-align: start;
+        }
+        .deal-card-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--bg-card-elevated);
+        }
+        .deal-card-badge {
+            position: absolute;
+            top: var(--space-sm); left: var(--space-sm);
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.5em;
+            border-radius: var(--radius-sm);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: #fff;
+        }
+        .deal-card-fav {
+            position: absolute;
+            top: var(--space-sm); right: var(--space-sm);
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            border: none; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .deal-card-fav svg { width: 14px; height: 14px; }
+        .deal-card-price {
+            font-size: var(--text-lg);
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-top: var(--space-sm);
+        }
+        .deal-card-specs {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .deal-card-address {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+        .deal-card-person {
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .deal-card-person svg { width: 13px; height: 13px; color: var(--text-tertiary); flex-shrink: 0; }
+        .deal-card-context {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: 1px;
+            line-height: 1.35;
+        }
+        .deal-card-status {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            margin-top: var(--space-xs);
+        }
+        .status-active { color: var(--accent-blue); }
+        .status-pending { color: var(--accent-orange); }
+        .status-closing { color: var(--accent-teal); }
+
+        /* =============================================
+           SECTION CARD
+           ============================================= */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--space-lg) var(--space-lg);
+            padding: var(--space-2xl);
+        }
+        .section-card-title {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            margin-bottom: var(--space-2xl);
+        }
+
+        /* =============================================
+           SCHEDULE ROWS
+           ============================================= */
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 3.5rem 1fr auto;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--divider);
+        }
+        .schedule-row:last-child { border-bottom: none; }
+        .schedule-time {
+            font-size: var(--text-base);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .schedule-event-name {
+            font-size: var(--text-base);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .schedule-event-sub {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+        .schedule-type {
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.15em 0.55em;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+        }
+        .type-showing { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .type-closing { background: var(--accent-teal-bg); color: var(--accent-teal); }
+        .type-meeting { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .type-call { background: var(--accent-purple-bg); color: var(--accent-purple); }
+        .type-touring { background: var(--accent-blue-bg); color: var(--accent-blue); }
+        .type-listing { background: var(--accent-orange-bg); color: var(--accent-orange); }
+        .type-pending { background: var(--accent-purple-bg); color: var(--accent-purple); }
+
+        /* =============================================
+           WEEK AHEAD SUMMARY
+           ============================================= */
+        .week-ahead {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--space-lg) var(--space-lg);
+            padding: var(--space-2xl);
+        }
+        .week-ahead-title {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            margin-bottom: var(--space-xl);
+        }
+        .week-day-row {
+            display: grid;
+            grid-template-columns: 3.5rem 1fr auto;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--divider);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .week-day-row:last-child { border-bottom: none; }
+        .week-day-row.today-row { }
+        .week-day-label {
+            font-size: var(--text-base);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .week-day-label-today {
+            font-size: var(--text-xs);
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+        .week-day-events {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .week-day-pip {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+        .week-day-count {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl) var(--space-xl);
+            color: var(--text-tertiary);
+            font-size: var(--text-base);
+        }
+
+        /* =============================================
+           STICKY BOTTOM
+           ============================================= */
+        .sticky-bottom {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(11,15,20,0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--border-subtle);
+            padding: var(--space-md) var(--space-xl) calc(var(--space-md) + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+        .sticky-bottom-inner {
+            max-width: 430px;
+            margin: 0 auto;
+            display: flex;
+            gap: var(--space-md);
+        }
+        .btn-outline {
+            padding: 0.85em 1.25em;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--accent-blue);
+            background: transparent;
+            color: var(--accent-blue);
+            font-size: var(--text-md);
+            font-weight: 700;
+            font-family: var(--font-family);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            flex: 1;
+            padding: 0.85em 1.25em;
+            border-radius: var(--radius-lg);
+            border: none;
+            background: var(--accent-blue);
+            color: var(--text-inverse);
+            font-size: var(--text-md);
+            font-weight: 700;
+            font-family: var(--font-family);
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-primary:active { opacity: 0.85; }
+        .btn-primary-sub {
+            display: block;
+            font-size: var(--text-xs);
+            font-weight: 500;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+
+        <!-- Header -->
+        <div class="dash-header">
+            <div class="dash-header-left">
+                <div class="dash-greeting" id="greeting">Good morning</div>
+                <div class="dash-date" id="dateLabel">Saturday, Feb 8</div>
+            </div>
+            <div class="dash-avatar">JR</div>
+        </div>
+
+        <!-- Day Picker -->
+        <div class="day-picker-card">
+            <div class="day-picker-title" id="dayPickerTitle">Your week</div>
+            <div class="day-picker-scroll" id="dayPicker"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-chip"><div class="stat-chip-value" id="statDeals" style="color:var(--accent-blue);">0</div><div class="stat-chip-label">Appts</div></div>
+            <div class="stat-chip"><div class="stat-chip-value" id="statShowings" style="color:var(--accent-teal);">0</div><div class="stat-chip-label">Showings</div></div>
+            <div class="stat-chip"><div class="stat-chip-value" id="statPending" style="color:var(--accent-orange);">0</div><div class="stat-chip-label">Pending</div></div>
+            <div class="stat-chip"><div class="stat-chip-value" id="statClosing" style="color:var(--accent-purple);">0</div><div class="stat-chip-label">Closings</div></div>
+        </div>
+
+        <!-- Pill filter -->
+        <div class="pill-selector-wrap">
+            <div class="pill-selector" id="pillSelector">
+                <button class="pill-btn active" data-filter="all">All</button>
+                <button class="pill-btn" data-filter="touring">Touring</button>
+                <button class="pill-btn" data-filter="listing">Listing</button>
+                <button class="pill-btn" data-filter="showing">Showing</button>
+                <button class="pill-btn" data-filter="pending">Pending</button>
+                <button class="pill-btn" data-filter="closing">Closing</button>
+            </div>
+        </div>
+
+        <!-- Deal cards -->
+        <div class="deals-scroll" id="dealsScroll"></div>
+        <div id="dealsEmpty" class="empty-state" style="display:none;">No appointments this day</div>
+        <div style="height: var(--space-sm);"></div>
+
+        <!-- Schedule for selected day -->
+        <div class="section-card" id="scheduleCard">
+            <div class="section-card-title" id="scheduleTitle">Schedule</div>
+            <div id="scheduleBody"></div>
+        </div>
+
+        <!-- Week Ahead summary -->
+        <div class="week-ahead" id="weekAhead">
+            <div class="week-ahead-title">Week at a glance</div>
+            <div id="weekAheadBody"></div>
+        </div>
+
+        <div style="height: var(--space-3xl);"></div>
+    </div>
+
+    <!-- Sticky bottom -->
+    <div class="sticky-bottom">
+        <div class="sticky-bottom-inner">
+            <button class="btn-outline">+ Log</button>
+            <button class="btn-primary" id="ctaBtn">
+                Start your day
+                <span class="btn-primary-sub" id="ctaSub">5 appointments today</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ---- Greeting ----
+        (function() {
+            const h = new Date().getHours();
+            document.getElementById('greeting').textContent =
+                h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+            document.getElementById('dateLabel').textContent =
+                new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        })();
+
+        // ---- Photos ----
+        const photos = {
+            craftsman:    'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop',
+            suburban:     'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=400&fit=crop',
+            greenLawn:    'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop',
+            redDoor:      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&h=400&fit=crop',
+            modern:       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a8?w=600&h=400&fit=crop',
+            luxury:       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
+            twilight:     'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=600',
+            family:       'https://images.pexels.com/photos/3555615/pexels-photo-3555615.jpeg?auto=compress&cs=tinysrgb&w=600',
+            mansion:      'https://images.pexels.com/photos/7031412/pexels-photo-7031412.jpeg?auto=compress&cs=tinysrgb&w=600',
+            forSale:      'https://images.pexels.com/photos/8288954/pexels-photo-8288954.jpeg?auto=compress&cs=tinysrgb&w=600',
+            neighborhood: 'https://images.pexels.com/photos/8504300/pexels-photo-8504300.jpeg?auto=compress&cs=tinysrgb&w=600',
+        };
+
+        // ---- Type colors ----
+        const typeColors = {
+            showing:  { bg: 'var(--accent-blue-bg)',   color: 'var(--accent-blue)',   dot: '#5c9eff', cls: 'type-showing',  statusCls: 'status-active' },
+            touring:  { bg: 'var(--accent-blue-bg)',   color: 'var(--accent-blue)',   dot: '#5c9eff', cls: 'type-touring',  statusCls: 'status-active' },
+            listing:  { bg: 'var(--accent-orange-bg)', color: 'var(--accent-orange)', dot: '#ffc554', cls: 'type-listing',  statusCls: 'status-pending' },
+            pending:  { bg: 'var(--accent-purple-bg)', color: 'var(--accent-purple)', dot: '#c084fc', cls: 'type-pending',  statusCls: 'status-pending' },
+            closing:  { bg: 'var(--accent-teal-bg)',   color: 'var(--accent-teal)',   dot: '#3ecfb4', cls: 'type-closing',  statusCls: 'status-closing' },
+            call:     { bg: 'var(--accent-purple-bg)', color: 'var(--accent-purple)', dot: '#c084fc', cls: 'type-call',     statusCls: 'status-pending' },
+            meeting:  { bg: 'var(--accent-orange-bg)', color: 'var(--accent-orange)', dot: '#ffc554', cls: 'type-meeting',  statusCls: 'status-pending' },
+        };
+
+        // ---- Build week dates (Sun–Sat containing today) ----
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const weekDates = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(startOfWeek);
+            d.setDate(startOfWeek.getDate() + i);
+            weekDates.push(d);
+        }
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+        function dateKey(d) { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+        // ---- Deal data organized by day offset from start of week ----
+        // dayOffset: 0=Sun, 1=Mon, ..., 6=Sat
+        const allDeals = [
+            // Sunday (today = Feb 8 in this prototype scenario, but dynamic)
+            { dayOffset: today.getDay(), type: 'showing', side: 'Buyer', time: '10:00 AM', price: '$1,200,000', specs: '3 bd · 2 ba · 1,450 sqft',
+              address: '742 Oceanview Dr', status: 'Showing', img: photos.craftsman,
+              person: 'The Millers', context: 'Pre-approved $1.3M · 2nd showing, loved the backyard' },
+            { dayOffset: today.getDay(), type: 'touring', side: 'Buyer', time: '11:30 AM', price: '$875,000', specs: '2 bd · 2 ba · 1,100 sqft',
+              address: '1580 Bay St, Unit 4', status: 'Tour', img: photos.modern,
+              person: 'Sarah Chen', context: 'First-time buyer · Wants walkable neighborhood' },
+            { dayOffset: today.getDay(), type: 'listing', side: 'Seller', time: '1:00 PM', price: '$1,450,000', specs: '5 bd · 4 ba · 3,100 sqft',
+              address: '88 Pine Ridge Rd', status: 'Listing consult', img: photos.luxury,
+              person: 'David & Maria Reyes', context: 'Relocating to Portland · Want to list in 3 weeks' },
+            { dayOffset: today.getDay(), type: 'closing', side: 'Seller', time: '4:00 PM', price: '$945,000', specs: '4 bd · 3 ba · 2,200 sqft',
+              address: '215 Elm St', status: 'Closing', img: photos.suburban,
+              person: 'Tom Nakamura', context: 'Title clear · Final walkthrough done' },
+            { dayOffset: today.getDay(), type: 'touring', side: 'Buyer', time: '5:30 PM', price: '$720,000', specs: '2 bd · 1 ba · 980 sqft',
+              address: '402 Maple Ave, #3', status: 'Tour', img: photos.redDoor,
+              person: 'Kevin Park', context: 'Pre-approved $950K · Investment property' },
+
+            // Tomorrow (today+1)
+            { dayOffset: (today.getDay()+1)%7, type: 'listing', side: 'Seller', time: '9:00 AM', price: '$1,050,000', specs: '3 bd · 2 ba · 1,600 sqft',
+              address: '820 Mission St', status: 'Photo shoot', img: photos.family,
+              person: 'Mike Henderson', context: 'Photographer booked · Staging done' },
+            { dayOffset: (today.getDay()+1)%7, type: 'showing', side: 'Buyer', time: '2:00 PM', price: '$1,100,000', specs: '3 bd · 2 ba · 1,800 sqft',
+              address: '330 Riverside Dr', status: 'Showing', img: photos.greenLawn,
+              person: 'Raj & Priya Mehta', context: 'Relocating from LA · Need 3+ bd, good schools' },
+            { dayOffset: (today.getDay()+1)%7, type: 'pending', side: 'Buyer', time: '4:00 PM', price: '$1,320,000', specs: '4 bd · 3 ba · 2,400 sqft',
+              address: '190 Seabright Ave', status: 'Counter deadline', img: photos.neighborhood,
+              person: 'The Hendersons', context: 'Countered at $1.29M · Seller wants 30-day close' },
+
+            // Day after tomorrow (today+2)
+            { dayOffset: (today.getDay()+2)%7, type: 'touring', side: 'Buyer', time: '10:00 AM', price: '$1,600,000', specs: '4 bd · 3 ba · 2,800 sqft',
+              address: '1200 Pacific Ave', status: 'Tour', img: photos.mansion,
+              person: 'Lisa Tran', context: 'Move-up buyer · Selling condo first' },
+            { dayOffset: (today.getDay()+2)%7, type: 'pending', side: 'Seller', time: '1:00 PM', price: '$895,000', specs: '2 bd · 2 ba · 1,200 sqft',
+              address: '15 Harbor Ct', status: 'Offer review', img: photos.twilight,
+              person: 'Janet & Ron Cole', context: '2 offers in · Highest $910K, 15-day close' },
+
+            // 3 days out (today+3)
+            { dayOffset: (today.getDay()+3)%7, type: 'listing', side: 'Seller', time: '10:00 AM', price: '$1,050,000', specs: '3 bd · 2 ba · 1,600 sqft',
+              address: '820 Mission St', status: 'Go live on MLS', img: photos.family,
+              person: 'Mike Henderson', context: 'Photos approved · Pricing finalized at $1.05M' },
+            { dayOffset: (today.getDay()+3)%7, type: 'showing', side: 'Buyer', time: '3:00 PM', price: '$780,000', specs: '3 bd · 2 ba · 1,350 sqft',
+              address: '55 Walnut St', status: 'Showing', img: photos.forSale,
+              person: 'Angela Torres', context: 'Downsizing · Wants single story, under $800K' },
+
+            // 4 days out (today+4)
+            { dayOffset: (today.getDay()+4)%7, type: 'closing', side: 'Seller', time: '11:00 AM', price: '$780,000', specs: '3 bd · 2 ba · 1,350 sqft',
+              address: '55 Walnut St', status: 'Closing', img: photos.forSale,
+              person: 'Angela Torres', context: 'Appraisal cleared · Buyer financing confirmed' },
+            { dayOffset: (today.getDay()+4)%7, type: 'touring', side: 'Buyer', time: '2:00 PM', price: '$925,000', specs: '3 bd · 2 ba · 1,500 sqft',
+              address: '1455 Beach Hill Rd', status: 'Tour 3 homes', img: photos.craftsman,
+              person: 'Marcus & Dani Webb', context: 'New clients · Pre-approved $1M · First meeting' },
+
+            // 5 days out (today+5) — light day
+            { dayOffset: (today.getDay()+5)%7, type: 'meeting', side: 'Team', time: '9:00 AM', price: '', specs: '',
+              address: 'Office', status: 'Team meeting', img: '',
+              person: 'Broker meeting', context: 'Weekly pipeline review · Bring market numbers' },
+        ];
+
+        // ---- State ----
+        let selectedDayOffset = today.getDay();
+        let currentFilter = 'all';
+
+        function getDealsForDay(offset) {
+            return allDeals.filter(d => d.dayOffset === offset);
+        }
+        function getFilteredDeals() {
+            const deals = getDealsForDay(selectedDayOffset);
+            if (currentFilter === 'all') return deals;
+            return deals.filter(d => d.type === currentFilter);
+        }
+
+        // ---- SVGs ----
+        const heartSvg = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>';
+        const personIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>';
+
+        // ---- Render day picker ----
+        function renderDayPicker() {
+            const container = document.getElementById('dayPicker');
+            container.innerHTML = weekDates.map((d, i) => {
+                const dk = dateKey(d);
+                const isToday = dk === todayKey;
+                const isPast = d < today && !isToday;
+                const isActive = d.getDay() === selectedDayOffset;
+                const dayDeals = getDealsForDay(d.getDay());
+                // Build dots for events (max 4 shown)
+                const dots = dayDeals.slice(0, 4).map(deal => {
+                    const tc = typeColors[deal.type] || typeColors.showing;
+                    return `<div class="day-cell-dot" style="background:${tc.dot}"></div>`;
+                }).join('');
+
+                return `<div class="day-cell ${isActive ? 'active' : ''} ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}"
+                             data-offset="${d.getDay()}" onclick="selectDay(${d.getDay()})">
+                    <div class="day-cell-dow">${dayNames[d.getDay()]}</div>
+                    <div class="day-cell-num">${d.getDate()}</div>
+                    <div class="day-cell-month">${monthNames[d.getMonth()]}</div>
+                    <div class="day-cell-dots">${dots || ''}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- Render deal cards ----
+        function renderDeals() {
+            const filtered = getFilteredDeals();
+            const container = document.getElementById('dealsScroll');
+            const empty = document.getElementById('dealsEmpty');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = '';
+                return;
+            }
+            empty.style.display = 'none';
+
+            container.innerHTML = filtered.filter(d => d.img).map(d => {
+                const tc = typeColors[d.type] || typeColors.showing;
+                return `<div class="deal-card">
+                    <div class="deal-card-img" style="background-image:url('${d.img}')">
+                        <span class="deal-card-badge">${d.side}</span>
+                        <button class="deal-card-fav" aria-label="Favorite">${heartSvg}</button>
+                    </div>
+                    <div class="deal-card-price">${d.price}</div>
+                    <div class="deal-card-specs">${d.specs}</div>
+                    <div class="deal-card-address">${d.address}</div>
+                    <div class="deal-card-person">${personIcon} ${d.person}</div>
+                    <div class="deal-card-context">${d.context}</div>
+                    <div class="deal-card-status ${tc.statusCls}">${d.time} · ${d.status}</div>
+                </div>`;
+            }).join('');
+
+            // If only non-property deals (like team meeting), show empty cards state but keep schedule
+            if (container.innerHTML === '') empty.style.display = '';
+        }
+
+        // ---- Render schedule ----
+        function renderSchedule() {
+            const deals = getDealsForDay(selectedDayOffset);
+            const body = document.getElementById('scheduleBody');
+            const card = document.getElementById('scheduleCard');
+
+            if (deals.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+            card.style.display = '';
+
+            const selectedDate = weekDates.find(d => d.getDay() === selectedDayOffset);
+            const isToday = selectedDate && dateKey(selectedDate) === todayKey;
+            document.getElementById('scheduleTitle').textContent = isToday ? "Today's schedule" : `${dayNames[selectedDayOffset]}'s schedule`;
+
+            body.innerHTML = deals.map(d => {
+                const tc = typeColors[d.type] || typeColors.showing;
+                return `<div class="schedule-row">
+                    <div class="schedule-time">${d.time.replace(/ [AP]M/, '')}</div>
+                    <div>
+                        <div class="schedule-event-name">${d.address}</div>
+                        <div class="schedule-event-sub">${d.person} · ${d.status}</div>
+                    </div>
+                    <span class="schedule-type ${tc.cls}">${d.type}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- Render stats ----
+        function renderStats() {
+            const deals = getDealsForDay(selectedDayOffset);
+            document.getElementById('statDeals').textContent = deals.length;
+            document.getElementById('statShowings').textContent = deals.filter(d => d.type === 'showing' || d.type === 'touring').length;
+            document.getElementById('statPending').textContent = deals.filter(d => d.type === 'pending' || d.type === 'listing').length;
+            document.getElementById('statClosing').textContent = deals.filter(d => d.type === 'closing').length;
+        }
+
+        // ---- Render pill counts ----
+        function renderPillCounts() {
+            const deals = getDealsForDay(selectedDayOffset);
+            const counts = { all: deals.length };
+            ['touring','listing','showing','pending','closing'].forEach(t => {
+                counts[t] = deals.filter(d => d.type === t).length;
+            });
+            document.querySelectorAll('#pillSelector .pill-btn').forEach(btn => {
+                const f = btn.dataset.filter;
+                let countEl = btn.querySelector('.pill-count');
+                if (!countEl) {
+                    countEl = document.createElement('span');
+                    countEl.className = 'pill-count';
+                    btn.appendChild(countEl);
+                }
+                countEl.textContent = counts[f] || 0;
+            });
+        }
+
+        // ---- Render week ahead ----
+        function renderWeekAhead() {
+            const body = document.getElementById('weekAheadBody');
+            body.innerHTML = weekDates.map(d => {
+                const dk = dateKey(d);
+                const isToday = dk === todayKey;
+                const isPast = d < today && !isToday;
+                if (isPast) return '';
+                const dayDeals = getDealsForDay(d.getDay());
+                const pips = dayDeals.map(deal => {
+                    const tc = typeColors[deal.type] || typeColors.showing;
+                    return `<div class="week-day-pip" style="background:${tc.dot}"></div>`;
+                }).join('');
+                return `<div class="week-day-row ${isToday ? 'today-row' : ''}" onclick="selectDay(${d.getDay()})">
+                    <div>
+                        <div class="week-day-label">${dayNames[d.getDay()]} ${d.getDate()}</div>
+                        ${isToday ? '<div class="week-day-label-today">Today</div>' : ''}
+                    </div>
+                    <div class="week-day-events">${pips || '<span style="font-size:var(--text-xs);color:var(--text-tertiary);">No appts</span>'}</div>
+                    <div class="week-day-count">${dayDeals.length} ${dayDeals.length === 1 ? 'appt' : 'appts'}</div>
+                </div>`;
+            }).filter(Boolean).join('');
+        }
+
+        // ---- Update CTA ----
+        function renderCTA() {
+            const deals = getDealsForDay(selectedDayOffset);
+            const btn = document.getElementById('ctaBtn');
+            const sub = document.getElementById('ctaSub');
+            const selectedDate = weekDates.find(d => d.getDay() === selectedDayOffset);
+            const isToday = selectedDate && dateKey(selectedDate) === todayKey;
+
+            if (deals.length === 0) {
+                btn.innerHTML = `Nothing scheduled<span class="btn-primary-sub">Enjoy the day off</span>`;
+            } else if (isToday && deals.length > 0) {
+                const first = deals[0];
+                btn.innerHTML = `Start your day<span class="btn-primary-sub">${deals.length} appointments · First at ${first.time}</span>`;
+            } else {
+                btn.innerHTML = `View ${dayNames[selectedDayOffset]}'s plan<span class="btn-primary-sub">${deals.length} appointments</span>`;
+            }
+        }
+
+        // ---- Select a day ----
+        function selectDay(offset) {
+            selectedDayOffset = offset;
+            currentFilter = 'all';
+            document.querySelectorAll('#pillSelector .pill-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === 0);
+            });
+            renderAll();
+        }
+
+        // ---- Pill filter ----
+        document.getElementById('pillSelector').addEventListener('click', function(e) {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            this.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderDeals();
+        });
+
+        // ---- Render all ----
+        function renderAll() {
+            renderDayPicker();
+            renderStats();
+            renderPillCounts();
+            renderDeals();
+            renderSchedule();
+            renderWeekAhead();
+            renderCTA();
+        }
+        renderAll();
+    </script>
+</body>
+</html>
