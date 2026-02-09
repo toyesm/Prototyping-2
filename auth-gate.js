@@ -8,30 +8,46 @@
 (function() {
   const CLIENT_ID = '959598407350-vi4eejkgjts14sq7evurlokdoolg6q6e.apps.googleusercontent.com';
 
-  // Add your allowed emails here
-  const ALLOWED_EMAILS = [
-    // Add emails that should have access, e.g.:
-    // 'you@gmail.com',
-    // 'teammate@gmail.com',
+  // Allowed emails stored as SHA-256 hashes for privacy
+  const ALLOWED_HASHES = [
+    '5d66d0aa9a0eb525ca169c2abe9a408e979cd0209694271ee32c9145ec4ce5bc',
+    'a9b570d01520b52d381f2e9bb695f5d4a466616e6e2a5ea85ef6a293e4f1ed18',
+    '2262ef3cab29b55cdd5595b1dcb5826470ed8c7ee03948c9b972461f23db07fb',
+    '21a7547e9dff2d6f665e1b9453367eb6091b40bf570e8f5787ad4561f707f8b5',
   ];
 
-  // If empty, allow ANY Google sign-in (useful during setup)
-  const ALLOW_ANY = ALLOWED_EMAILS.length === 0;
+  const ALLOW_ANY = ALLOWED_HASHES.length === 0;
+
+  async function hashEmail(email) {
+    const data = new TextEncoder().encode(email.toLowerCase());
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function isEmailAllowed(email) {
+    if (ALLOW_ANY) return true;
+    const hash = await hashEmail(email);
+    return ALLOWED_HASHES.includes(hash);
+  }
 
   const SESSION_KEY = 'proto_auth_session';
   const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
   // Check for existing valid session
-  function hasValidSession() {
+  function getSession() {
     try {
       const session = JSON.parse(localStorage.getItem(SESSION_KEY));
       if (session && session.email && session.expires > Date.now()) {
-        if (ALLOW_ANY || ALLOWED_EMAILS.includes(session.email)) {
-          return true;
-        }
+        return session;
       }
     } catch (e) {}
-    return false;
+    return null;
+  }
+
+  async function hasValidSession() {
+    const session = getSession();
+    if (!session) return false;
+    return await isEmailAllowed(session.email);
   }
 
   function saveSession(email, name, picture) {
@@ -48,16 +64,23 @@
     location.reload();
   }
 
-  // If already authenticated, show the page and add a small logout button
-  if (hasValidSession()) {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-    addLogoutButton(session);
-    return;
-  }
-
-  // Hide page content
+  // Hide page content immediately while we check auth
   document.documentElement.style.visibility = 'hidden';
   document.documentElement.style.overflow = 'hidden';
+
+  // Check session asynchronously
+  hasValidSession().then(valid => {
+    if (valid) {
+      const session = getSession();
+      document.documentElement.style.visibility = '';
+      document.documentElement.style.overflow = '';
+      addLogoutButton(session);
+      return;
+    }
+    showLoginOverlay();
+  });
+
+  function showLoginOverlay() {
 
   // Create login overlay
   const overlay = document.createElement('div');
@@ -175,15 +198,17 @@
     const name = payload.name;
     const picture = payload.picture;
 
-    if (ALLOW_ANY || ALLOWED_EMAILS.includes(email)) {
-      saveSession(email, name, picture);
-      overlay.remove();
-      document.documentElement.style.visibility = '';
-      document.documentElement.style.overflow = '';
-      addLogoutButton({ email, name, picture });
-    } else {
-      document.getElementById('auth-denied-msg').style.display = 'block';
-    }
+    isEmailAllowed(email).then(allowed => {
+      if (allowed) {
+        saveSession(email, name, picture);
+        overlay.remove();
+        document.documentElement.style.visibility = '';
+        document.documentElement.style.overflow = '';
+        addLogoutButton({ email, name, picture });
+      } else {
+        document.getElementById('auth-denied-msg').style.display = 'block';
+      }
+    });
   };
 
   // Trigger Google One Tap / popup sign-in
@@ -216,6 +241,16 @@
       callback: handleAuthCallback,
     });
   };
+
+  // Insert overlay and script
+  if (document.body) {
+    document.body.appendChild(overlay);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(overlay));
+  }
+  document.head.appendChild(gsiScript);
+
+  } // end showLoginOverlay
 
   function addLogoutButton(session) {
     const btn = document.createElement('div');
@@ -258,11 +293,4 @@
     document.body.appendChild(btn);
   }
 
-  // Insert overlay and script
-  if (document.body) {
-    document.body.appendChild(overlay);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(overlay));
-  }
-  document.head.appendChild(gsiScript);
 })();
