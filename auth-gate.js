@@ -60,7 +60,7 @@
   }
 
   function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('proto_auth_session');
     location.reload();
   }
 
