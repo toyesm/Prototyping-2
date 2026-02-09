@@ -81,8 +81,12 @@
   });
 
   function showLoginOverlay() {
+  // Restore html visibility so overlay can render, but hide body content behind it
+  document.documentElement.style.visibility = '';
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.visibility = 'hidden';
 
-  // Create login overlay
+  // Create login overlay (covers entire viewport)
   const overlay = document.createElement('div');
   overlay.id = 'auth-gate-overlay';
   overlay.innerHTML = `
@@ -91,6 +95,7 @@
         position: fixed;
         inset: 0;
         z-index: 999999;
+        visibility: visible;
         background: #0b0f14;
         display: flex;
         align-items: center;
@@ -202,7 +207,7 @@
       if (allowed) {
         saveSession(email, name, picture);
         overlay.remove();
-        document.documentElement.style.visibility = '';
+        document.body.style.visibility = '';
         document.documentElement.style.overflow = '';
         addLogoutButton({ email, name, picture });
       } else {
