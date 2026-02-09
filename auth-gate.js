@@ -258,44 +258,153 @@
   } // end showLoginOverlay
 
   function addLogoutButton(session) {
-    const btn = document.createElement('div');
-    btn.innerHTML = `
+    const el = document.createElement('div');
+    el.innerHTML = `
       <style>
-        #auth-logout-btn {
+        #auth-avatar {
           position: fixed;
-          bottom: 16px;
-          right: 16px;
+          top: 12px;
+          right: 12px;
           z-index: 99999;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          cursor: pointer;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          border: 2px solid rgba(255,255,255,0.15);
+          transition: transform 0.15s ease;
+          background: #242930;
+        }
+        #auth-avatar:active { transform: scale(0.92); }
+        #auth-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        #auth-avatar-fallback {
+          width: 100%;
+          height: 100%;
           display: flex;
           align-items: center;
-          gap: 8px;
-          background: rgba(26, 30, 37, 0.95);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 10px;
-          padding: 8px 14px;
-          cursor: pointer;
-          transition: opacity 0.2s;
+          justify-content: center;
+          color: #fff;
+          font-size: 0.875rem;
+          font-weight: 600;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        #auth-logout-btn:hover { opacity: 0.8; }
-        #auth-logout-btn img {
-          width: 24px;
-          height: 24px;
+        #auth-sheet-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 999998;
+          background: rgba(0,0,0,0);
+          transition: background 0.3s ease;
+          pointer-events: none;
+        }
+        #auth-sheet-backdrop.open {
+          background: rgba(0,0,0,0.5);
+          pointer-events: auto;
+        }
+        #auth-sheet {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 999999;
+          background: #1a1e25;
+          border-radius: 20px 20px 0 0;
+          padding: 0 24px calc(env(safe-area-inset-bottom, 20px) + 16px);
+          transform: translateY(100%);
+          transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #auth-sheet.open {
+          transform: translateY(0);
+        }
+        #auth-sheet .sheet-handle {
+          width: 36px;
+          height: 4px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 2px;
+          margin: 10px auto 20px;
+        }
+        #auth-sheet .sheet-profile {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 20px;
+        }
+        #auth-sheet .sheet-profile img {
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
         }
-        #auth-logout-btn span {
-          color: rgba(255,255,255,0.6);
-          font-size: 0.75rem;
+        #auth-sheet .sheet-profile-fallback {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: #5c9eff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          font-size: 1.25rem;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+        #auth-sheet .sheet-name {
+          color: #fff;
+          font-size: 1.0625rem;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+        #auth-sheet .sheet-email {
+          color: rgba(255,255,255,0.5);
+          font-size: 0.8125rem;
+          line-height: 1.3;
+        }
+        #auth-sheet .sheet-logout {
+          width: 100%;
+          padding: 14px;
+          border: none;
+          border-radius: 12px;
+          background: rgba(255, 92, 92, 0.12);
+          color: #ff5c5c;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s;
+          font-family: inherit;
+        }
+        #auth-sheet .sheet-logout:active {
+          background: rgba(255, 92, 92, 0.2);
         }
       </style>
-      <div id="auth-logout-btn" onclick="(${clearSession.toString()})()">
-        ${session.picture ? `<img src="${session.picture}" alt="">` : ''}
-        <span>Sign out</span>
+
+      <div id="auth-avatar" onclick="document.getElementById('auth-sheet').classList.add('open'); document.getElementById('auth-sheet-backdrop').classList.add('open');">
+        ${session.picture
+          ? '<img src="' + session.picture + '" alt="">'
+          : '<div id="auth-avatar-fallback">' + (session.name ? session.name.charAt(0).toUpperCase() : '?') + '</div>'}
+      </div>
+
+      <div id="auth-sheet-backdrop" onclick="document.getElementById('auth-sheet').classList.remove('open'); this.classList.remove('open');"></div>
+
+      <div id="auth-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-profile">
+          ${session.picture
+            ? '<img src="' + session.picture + '" alt="">'
+            : '<div class="sheet-profile-fallback">' + (session.name ? session.name.charAt(0).toUpperCase() : '?') + '</div>'}
+          <div>
+            <div class="sheet-name">${session.name || 'Signed in'}</div>
+            <div class="sheet-email">${session.email}</div>
+          </div>
+        </div>
+        <button class="sheet-logout" onclick="(${clearSession.toString()})()">Sign out</button>
       </div>
     `;
-    document.body.appendChild(btn);
+    document.body.appendChild(el);
   }
 
 })();
