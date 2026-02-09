@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Today — Stakeholder Deck</title>
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --bg-card: #1a1e25;
+            --bg-elevated: #242930;
+            --text: #ffffff;
+            --text-2: #a0a4ab;
+            --text-3: #6b7078;
+            --blue: #5c9eff;
+            --teal: #3ecfb4;
+            --orange: #ffc554;
+            --purple: #c084fc;
+            --red: #ff5c5c;
+            --border: rgba(255,255,255,0.08);
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+
+        /* ---- Slide container ---- */
+        .deck { width: 100vw; height: 100vh; position: relative; }
+        .slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 4rem 6rem;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateX(40px);
+        }
+        .slide.active {
+            opacity: 1; pointer-events: auto;
+            transform: translateX(0);
+        }
+        .slide.prev {
+            transform: translateX(-40px);
+        }
+
+        /* ---- Typography ---- */
+        .slide-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--blue);
+            margin-bottom: 1rem;
+        }
+        .slide-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            text-align: center;
+            max-width: 900px;
+        }
+        .slide-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-2);
+            text-align: center;
+            max-width: 700px;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+        .slide-body {
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* ---- Bullet list ---- */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+        .bullet-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-2);
+        }
+        .bullet-list li strong { color: var(--text); }
+        .bullet-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 0.45rem;
+        }
+
+        /* ---- Phone mockup ---- */
+        .phone-frame {
+            width: 280px; height: 560px;
+            border-radius: 2rem;
+            border: 3px solid rgba(255,255,255,0.15);
+            overflow: hidden;
+            background: var(--bg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .phone-frame iframe {
+            width: 430px; height: 860px;
+            border: none;
+            transform: scale(0.651);
+            transform-origin: top left;
+        }
+
+        /* ---- Two-column layout ---- */
+        .split {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .split-text { flex: 1; }
+        .split-text .slide-title {
+            text-align: left;
+            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+        }
+        .split-text .slide-subtitle {
+            text-align: left;
+        }
+
+        /* ---- Comparison (2 phones) ---- */
+        .compare {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        .compare-item { text-align: center; }
+        .compare-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 1rem;
+        }
+
+        /* ---- Stats row ---- */
+        .stat-row {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+        .stat-block { text-align: center; }
+        .stat-num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--text-3);
+            font-weight: 600;
+            margin-top: 0.35rem;
+        }
+
+        /* ---- Tags ---- */
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .tag {
+            padding: 0.35em 0.85em;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border: 1px solid var(--border);
+        }
+
+        /* ---- Progress bar ---- */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: var(--blue);
+            transition: width 0.3s ease;
+            z-index: 200;
+        }
+
+        /* ---- Nav ---- */
+        .nav {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+            background: rgba(26,30,37,0.85);
+            backdrop-filter: blur(16px);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+        .nav-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .nav-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--text-3);
+            opacity: 0.3;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-dot.active {
+            background: var(--blue);
+            opacity: 1;
+            width: 24px;
+            border-radius: 4px;
+        }
+        .nav-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-elevated);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .nav-btn:hover { background: var(--blue); color: #000; }
+        .nav-counter {
+            font-size: 0.75rem;
+            color: var(--text-3);
+            font-weight: 600;
+            min-width: 3rem;
+            text-align: center;
+        }
+
+        /* ---- Export button ---- */
+        .export-btn {
+            position: fixed;
+            top: 1.5rem; right: 1.5rem;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-2);
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s;
+        }
+        .export-btn:hover { background: var(--blue); color: #000; border-color: var(--blue); }
+        .export-btn svg { width: 16px; height: 16px; }
+
+        /* ---- Slide-specific ---- */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--blue), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .highlight { color: var(--blue); }
+        .dim { color: var(--text-3); }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 900px) {
+            .slide { padding: 2rem; }
+            .split { flex-direction: column; gap: 2rem; }
+            .split-text .slide-title { text-align: center; }
+            .split-text .slide-subtitle { text-align: center; }
+            .compare { flex-direction: column; }
+            .phone-frame { width: 220px; height: 440px; }
+            .phone-frame iframe { transform: scale(0.512); }
+            .stat-row { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Export to Google Slides -->
+    <button class="export-btn" onclick="exportMarkdown()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+        Export to Google Slides
+    </button>
+
+    <div class="deck" id="deck">
+
+        <!-- SLIDE 0: Title -->
+        <div class="slide active" data-slide="0">
+            <div class="slide-label">Product Concept</div>
+            <h1 class="slide-title">Agent <span class="gradient-text">Today</span></h1>
+            <p class="slide-subtitle">A mobile command center for real estate agents — every showing, lead, closing, and market signal in one daily view.</p>
+            <div class="stat-row">
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--blue);">7</div>
+                    <div class="stat-desc">Prototypes built</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--teal);">15</div>
+                    <div class="stat-desc">Design components</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--orange);">1</div>
+                    <div class="stat-desc">Design system</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 1: Problem -->
+        <div class="slide" data-slide="1">
+            <div class="slide-label">The Problem</div>
+            <h1 class="slide-title">Agents run their day across <span class="highlight">6+ apps</span></h1>
+            <p class="slide-subtitle">Calendar, MLS, CRM, email, GPS, and spreadsheets. Context switching kills productivity. No single view of "what matters today."</p>
+            <ul class="bullet-list">
+                <li><div class="bullet-dot" style="background:var(--red)"></div><div><strong>Missed follow-ups</strong> — leads go cold because the reminder was in a different app</div></li>
+                <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>No route intelligence</strong> — agents drive 50+ miles/day with no optimized path</div></li>
+                <li><div class="bullet-dot" style="background:var(--purple)"></div><div><strong>Market blindness</strong> — rate changes and inventory shifts buried in weekly emails</div></li>
+                <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Meeting prep</strong> — scrambling to remember client details in the car</div></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 2: Solution -->
+        <div class="slide" data-slide="2">
+            <div class="slide-label">Our Approach</div>
+            <h1 class="slide-title">One screen. Everything for <span class="gradient-text">today</span>.</h1>
+            <p class="slide-subtitle">We explored 7 different approaches to find the right daily command center — from timeline views to map-first routing to deal dashboards.</p>
+            <div class="tag-row">
+                <span class="tag" style="color:var(--blue);border-color:rgba(92,158,255,0.3);">Showings</span>
+                <span class="tag" style="color:var(--teal);border-color:rgba(62,207,180,0.3);">Closings</span>
+                <span class="tag" style="color:var(--orange);border-color:rgba(255,197,84,0.3);">Leads</span>
+                <span class="tag" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">Market Data</span>
+                <span class="tag" style="border-color:var(--border);">Route Planning</span>
+                <span class="tag" style="border-color:var(--border);">Commission Tracking</span>
+                <span class="tag" style="border-color:var(--border);">Client Context</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: V1 — Light mode -->
+        <div class="slide" data-slide="3">
+            <div class="split">
+                <div class="split-text">
+                    <div class="slide-label">Prototype v1</div>
+                    <h1 class="slide-title">Timeline-first approach</h1>
+                    <p class="slide-subtitle">Light mode. Chronological schedule with Up Next hero, hot leads carousel, market pulse chips, and quick actions bar.</p>
+                    <ul class="bullet-list">
+                        <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>What worked:</strong> Clear daily flow, at-a-glance schedule</div></li>
+                        <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>What didn't:</strong> No property context, generic UI, low information density</div></li>
+                    </ul>
+                </div>
+                <div class="phone-frame">
+                    <iframe src="../today/index.html" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Design system -->
+        <div class="slide" data-slide="4">
+            <div class="slide-label">Design Foundation</div>
+            <h1 class="slide-title">Dark Agent <span class="gradient-text">Design System</span></h1>
+            <p class="slide-subtitle">15 components extracted from top real estate apps. Dark mode for in-car usability. Each component named, documented, and reusable.</p>
+            <div class="stat-row">
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--blue);">15</div>
+                    <div class="stat-desc">Components (DA-01–15)</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--teal);">8</div>
+                    <div class="stat-desc">Color tokens</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--orange);">7</div>
+                    <div class="stat-desc">Type scales</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-num" style="color:var(--purple);">5</div>
+                    <div class="stat-desc">Radii tokens</div>
+                </div>
+            </div>
+            <div class="tag-row">
+                <span class="tag" style="color:var(--blue);border-color:rgba(92,158,255,0.3);">HeroImage</span>
+                <span class="tag" style="color:var(--teal);border-color:rgba(62,207,180,0.3);">PriceHeader</span>
+                <span class="tag" style="color:var(--orange);border-color:rgba(255,197,84,0.3);">EventCard</span>
+                <span class="tag" style="color:var(--purple);border-color:rgba(192,132,252,0.3);">PaymentBreakdown</span>
+                <span class="tag" style="border-color:var(--border);">PropertyCard</span>
+                <span class="tag" style="border-color:var(--border);">StickyBottomBar</span>
+                <span class="tag" style="border-color:var(--border);">TabToggle</span>
+                <span class="tag" style="border-color:var(--border);">PillSelector</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: V4 — Property-Led -->
+        <div class="slide" data-slide="5">
+            <div class="split">
+                <div class="split-text">
+                    <div class="slide-label">Concept A — Property-Led Day</div>
+                    <h1 class="slide-title">The next showing <em>is</em> the homepage</h1>
+                    <p class="slide-subtitle">Full-bleed property hero image. The page feels like a listing — but it's your schedule. Scroll down for pipeline, leads, and commission.</p>
+                    <ul class="bullet-list">
+                        <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Hero = next property</strong> — instant visual context</div></li>
+                        <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Schedule as event cards</strong> — horizontal scroll with property thumbnails</div></li>
+                        <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>Commission pipeline</strong> — see your money flowing</div></li>
+                    </ul>
+                </div>
+                <div class="phone-frame">
+                    <iframe src="../today-v4/index.html" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: V5 — Deal Dashboard -->
+        <div class="slide" data-slide="6">
+            <div class="split">
+                <div class="phone-frame">
+                    <iframe src="../today-v5/index.html" loading="lazy"></iframe>
+                </div>
+                <div class="split-text">
+                    <div class="slide-label">Concept B — Deal Dashboard</div>
+                    <h1 class="slide-title">Cockpit-style with <span class="highlight">live filters</span></h1>
+                    <p class="slide-subtitle">No hero. Maximum data density. Filter deals by type, toggle Today/This Week. Real photos, meeting context on every card.</p>
+                    <ul class="bullet-list">
+                        <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Dynamic deal cards</strong> — filter by touring, showing, listing, pending, closing</div></li>
+                        <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Market pulse</strong> — what changed this week + steady-state snapshot</div></li>
+                        <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>Meeting context</strong> — who you're meeting and why on every card</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: V5b — Day Planner -->
+        <div class="slide" data-slide="7">
+            <div class="split">
+                <div class="split-text">
+                    <div class="slide-label">Concept C — Day Planner</div>
+                    <h1 class="slide-title">Calendar cards for <span class="highlight">the week ahead</span></h1>
+                    <p class="slide-subtitle">Day picker strip at the top — tap any day to see that day's deals, schedule, and stats. Week-at-a-glance shows the full picture.</p>
+                    <ul class="bullet-list">
+                        <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Day picker</strong> — colored dots show appointment types per day</div></li>
+                        <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Everything updates</strong> — cards, schedule, stats, CTA all respond</div></li>
+                        <li><div class="bullet-dot" style="background:var(--purple)"></div><div><strong>Week summary</strong> — see appointment density across the week</div></li>
+                    </ul>
+                </div>
+                <div class="phone-frame">
+                    <iframe src="../today-v5b/index.html" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: V6 — Route Day -->
+        <div class="slide" data-slide="8">
+            <div class="split">
+                <div class="phone-frame">
+                    <iframe src="../today-v6/index.html" loading="lazy"></iframe>
+                </div>
+                <div class="split-text">
+                    <div class="slide-label">Concept D — Route Day</div>
+                    <h1 class="slide-title">Map-first with <span class="highlight">swipeable stops</span></h1>
+                    <p class="slide-subtitle">Interactive map with 4 color-coded pins. Swipe between event cards — the map pans and pins highlight in sync. Drive time itinerary below.</p>
+                    <ul class="bullet-list">
+                        <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Real map</strong> — Leaflet + OpenStreetMap, no API key needed</div></li>
+                        <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Card ↔ Map sync</strong> — swipe cards, map follows</div></li>
+                        <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>Route intelligence</strong> — drive times, total mileage, optimal order</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Comparison -->
+        <div class="slide" data-slide="9">
+            <div class="slide-label">Side by Side</div>
+            <h1 class="slide-title" style="font-size:clamp(1.5rem,3vw,2rem);margin-bottom:1rem;">Four concepts, one goal</h1>
+            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">
+                <div class="compare-item">
+                    <div class="phone-frame" style="width:160px;height:320px;">
+                        <iframe src="../today-v4/index.html" loading="lazy" style="transform:scale(0.372);"></iframe>
+                    </div>
+                    <div class="compare-label">Property-Led</div>
+                </div>
+                <div class="compare-item">
+                    <div class="phone-frame" style="width:160px;height:320px;">
+                        <iframe src="../today-v5/index.html" loading="lazy" style="transform:scale(0.372);"></iframe>
+                    </div>
+                    <div class="compare-label">Deal Dashboard</div>
+                </div>
+                <div class="compare-item">
+                    <div class="phone-frame" style="width:160px;height:320px;">
+                        <iframe src="../today-v5b/index.html" loading="lazy" style="transform:scale(0.372);"></iframe>
+                    </div>
+                    <div class="compare-label">Day Planner</div>
+                </div>
+                <div class="compare-item">
+                    <div class="phone-frame" style="width:160px;height:320px;">
+                        <iframe src="../today-v6/index.html" loading="lazy" style="transform:scale(0.372);"></iframe>
+                    </div>
+                    <div class="compare-label">Route Day</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Recommendation -->
+        <div class="slide" data-slide="10">
+            <div class="slide-label">Recommendation</div>
+            <h1 class="slide-title">Combine the best of each</h1>
+            <p class="slide-subtitle">The final product doesn't have to pick one. We recommend a modular approach — the best elements from each concept composed into one experience.</p>
+            <ul class="bullet-list">
+                <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>Day picker</strong> from v5b — agents plan ahead, not just today</div></li>
+                <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Deal cards with context</strong> from v5 — who, why, and meeting prep on every card</div></li>
+                <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>Route map</strong> from v6 — embedded above the schedule for drive-day awareness</div></li>
+                <li><div class="bullet-dot" style="background:var(--purple)"></div><div><strong>Market pulse</strong> from v5 — what changed + snapshot, updated daily</div></li>
+                <li><div class="bullet-dot" style="background:var(--red)"></div><div><strong>Commission pipeline</strong> from v5 — agents are motivated by money flow visibility</div></li>
+            </ul>
+        </div>
+
+        <!-- SLIDE 11: Next steps -->
+        <div class="slide" data-slide="11">
+            <div class="slide-label">Next Steps</div>
+            <h1 class="slide-title">From prototype to <span class="gradient-text">product</span></h1>
+            <ul class="bullet-list">
+                <li><div class="bullet-dot" style="background:var(--blue)"></div><div><strong>User testing</strong> — put all 4 concepts in front of 5 agents, measure task completion and preference</div></li>
+                <li><div class="bullet-dot" style="background:var(--teal)"></div><div><strong>Data integration plan</strong> — map to MLS, CRM, and calendar APIs for real data</div></li>
+                <li><div class="bullet-dot" style="background:var(--orange)"></div><div><strong>Build the composite</strong> — merge winning elements into one Remix + Polaris app</div></li>
+                <li><div class="bullet-dot" style="background:var(--purple)"></div><div><strong>Beta program</strong> — 10 agents, 30 days, measure daily active usage</div></li>
+            </ul>
+            <div style="margin-top:3rem;text-align:center;">
+                <div style="font-size:0.85rem;color:var(--text-3);font-weight:600;">All prototypes are live and interactive</div>
+                <div style="font-size:1rem;color:var(--blue);font-weight:700;margin-top:0.5rem;">Open any phone mockup to explore</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button class="nav-btn" onclick="prev()" aria-label="Previous">&#8249;</button>
+        <div class="nav-dots" id="navDots"></div>
+        <span class="nav-counter" id="navCounter">1 / 12</span>
+        <button class="nav-btn" onclick="next()" aria-label="Next">&#8250;</button>
+    </div>
+
+    <script>
+        // ---- Slide navigation ----
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        let current = 0;
+
+        function goTo(idx) {
+            if (idx < 0 || idx >= total) return;
+            slides[current].classList.remove('active');
+            slides[current].classList.add('prev');
+            setTimeout(() => slides[current === idx ? current : (current < idx ? current : current)].classList.remove('prev'), 400);
+            const prev = current;
+            current = idx;
+            slides.forEach((s, i) => {
+                s.classList.remove('active', 'prev');
+                if (i === current) s.classList.add('active');
+                else if (i === prev) s.classList.add('prev');
+            });
+            updateNav();
+        }
+        function next() { goTo(current + 1); }
+        function prev() { goTo(current - 1); }
+
+        function updateNav() {
+            document.getElementById('navCounter').textContent = `${current + 1} / ${total}`;
+            document.getElementById('progressBar').style.width = `${((current + 1) / total) * 100}%`;
+            document.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        }
+
+        // Build dots
+        const dotsEl = document.getElementById('navDots');
+        for (let i = 0; i < total; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.onclick = () => goTo(i);
+            dotsEl.appendChild(dot);
+        }
+        updateNav();
+
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        });
+
+        // Touch swipe
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+        });
+
+        // ---- Export to md2googleslides Markdown ----
+        function exportMarkdown() {
+            const md = `---
+title: Agent Today — Stakeholder Presentation
+theme: dark
+---
+
+# Agent **Today**
+## A mobile command center for real estate agents
+
+Every showing, lead, closing, and market signal in one daily view.
+
+- **7** prototypes built
+- **15** design system components
+- **1** unified design system
+
+---
+
+# The Problem
+## Agents run their day across **6+ apps**
+
+Calendar, MLS, CRM, email, GPS, and spreadsheets. Context switching kills productivity.
+
+- **Missed follow-ups** — leads go cold because the reminder was in a different app
+- **No route intelligence** — agents drive 50+ miles/day with no optimized path
+- **Market blindness** — rate changes and inventory shifts buried in weekly emails
+- **Meeting prep** — scrambling to remember client details in the car
+
+---
+
+# Our Approach
+## One screen. Everything for **today**.
+
+We explored 7 different approaches to find the right daily command center.
+
+Capabilities: Showings, Closings, Leads, Market Data, Route Planning, Commission Tracking, Client Context
+
+---
+
+# Prototype v1 — Timeline-First
+
+Light mode chronological schedule with Up Next hero, hot leads carousel, and market pulse chips.
+
+- **What worked:** Clear daily flow, at-a-glance schedule
+- **What didn't:** No property context, generic UI, low information density
+
+---
+
+# Dark Agent Design System
+
+15 components extracted from top real estate apps. Dark mode for in-car usability.
+
+- **15** Components (DA-01 through DA-15)
+- **8** Color tokens
+- **7** Type scales
+- **5** Border radii
+
+Key components: HeroImage, PriceHeader, EventCard, PaymentBreakdown, PropertyCard, StickyBottomBar, TabToggle, PillSelector
+
+---
+
+# Concept A — Property-Led Day
+
+The next showing **is** the homepage. Full-bleed property hero image.
+
+- **Hero = next property** — instant visual context
+- **Schedule as event cards** — horizontal scroll with property thumbnails
+- **Commission pipeline** — see your money flowing
+
+---
+
+# Concept B — Deal Dashboard
+
+Cockpit-style with **live filters**. No hero. Maximum data density.
+
+- **Dynamic deal cards** — filter by touring, showing, listing, pending, closing
+- **Market pulse** — what changed this week + steady-state snapshot
+- **Meeting context** — who you're meeting and why on every card
+
+---
+
+# Concept C — Day Planner
+
+Calendar cards for the **week ahead**. Day picker strip at the top.
+
+- **Day picker** — colored dots show appointment types per day
+- **Everything updates** — cards, schedule, stats, CTA all respond
+- **Week summary** — see appointment density across the week
+
+---
+
+# Concept D — Route Day
+
+Map-first with **swipeable stops**. Interactive map with color-coded pins.
+
+- **Real map** — Leaflet + OpenStreetMap, no API key needed
+- **Card ↔ Map sync** — swipe cards, map follows
+- **Route intelligence** — drive times, total mileage, optimal order
+
+---
+
+# Four Concepts, One Goal
+
+| Concept | Strength | Best For |
+|---------|----------|----------|
+| Property-Led | Visual context | Showing-heavy days |
+| Deal Dashboard | Data density | Pipeline management |
+| Day Planner | Week planning | Scheduling ahead |
+| Route Day | Drive optimization | Multi-stop days |
+
+---
+
+# Recommendation: Combine the Best
+
+The final product merges the winning elements:
+
+- **Day picker** from v5b — agents plan ahead, not just today
+- **Deal cards with context** from v5 — who, why, and meeting prep
+- **Route map** from v6 — embedded for drive-day awareness
+- **Market pulse** from v5 — what changed + snapshot, updated daily
+- **Commission pipeline** from v5 — money flow visibility
+
+---
+
+# Next Steps: Prototype → Product
+
+1. **User testing** — put all 4 concepts in front of 5 agents
+2. **Data integration plan** — map to MLS, CRM, and calendar APIs
+3. **Build the composite** — merge winning elements into one app
+4. **Beta program** — 10 agents, 30 days, measure daily active usage
+
+All prototypes are live and interactive.
+`;
+            // Download as .md file
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'agent-today-deck.md';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // Show instructions
+            setTimeout(() => {
+                alert('Markdown downloaded!\\n\\nTo import to Google Slides:\\n\\n1. npm install -g md2gslides\\n2. md2gslides agent-today-deck.md --title "Agent Today"\\n\\nThis will create a new Google Slides presentation.');
+            }, 300);
+        }
+    </script>
+</body>
+</html>
